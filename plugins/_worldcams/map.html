@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>World cams</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css">
+<style>
+  /* The HUD's own palette (ui.py, class C). */
+  :root {
+    --bg: #020a1c; --panel: #061433; --panel2: #08183d; --border: #16397a;
+    --pri: #4db8ff; --pri-dim: #2a72c9; --acc: #ff8a2a; --text: #cfe9ff;
+    --dim: #5f86c2; --red: #ff3355; --green: #3dffb0;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 13px Bahnschrift, "Segoe UI", sans-serif; overflow: hidden; }
+  #app { display: flex; height: 100%; }
+  #mapwrap { position: relative; flex: 1; min-width: 0; }
+  #map { position: absolute; inset: 0; background: var(--bg); }
+
+  #bar { position: absolute; top: 8px; left: 8px; right: 8px; z-index: 1000;
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap; pointer-events: none; }
+  #bar > * { pointer-events: auto; }
+  .box { background: rgba(6, 20, 51, .92); border: 1px solid var(--border); border-radius: 4px; }
+  #crumbs { padding: 6px 10px; letter-spacing: .04em; }
+  #crumbs a { color: var(--pri); cursor: pointer; }
+  #crumbs a:hover { text-decoration: underline; }
+  #crumbs .sep { color: var(--dim); margin: 0 6px; }
+  #goto { margin-left: auto; color: var(--text); padding: 6px 10px; width: 220px; font: inherit; }
+  #goto:focus { outline: none; border-color: var(--pri); }
+  #goto::placeholder { color: var(--dim); }
+
+  #chips { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 1000;
+    display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; width: max-content; max-width: 92%; }
+  .chip { color: var(--pri); padding: 6px 12px; border-radius: 14px; cursor: pointer; font: inherit;
+    letter-spacing: .05em; }
+  .chip:hover { border-color: var(--pri); background: var(--panel2); }
+
+  #side { width: 300px; flex: none; background: var(--panel); border-left: 1px solid var(--border);
+    display: flex; flex-direction: column; min-height: 0; }
+  #side h2 { margin: 0; padding: 12px 12px 2px; font-size: 14px; color: var(--pri);
+    letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
+  #status { padding: 2px 12px 8px; color: var(--dim); min-height: 22px; }
+  #list { flex: 1; overflow-y: auto; padding: 0 8px 8px; }
+  #hint { padding: 4px 12px; color: var(--dim); line-height: 1.6; }
+  #hint b { color: var(--text); font-weight: 600; }
+  .cam { display: flex; gap: 8px; padding: 6px; border: 1px solid transparent; border-radius: 4px;
+    cursor: pointer; align-items: flex-start; }
+  .cam:hover { background: var(--panel2); border-color: var(--border); }
+  .cam img { width: 96px; height: 54px; object-fit: cover; flex: none; border-radius: 2px; background: #000; }
+  .cam .t { font-size: 12px; line-height: 1.3; max-height: 3.9em; overflow: hidden; }
+  .cam .s { font-size: 11px; margin-top: 3px; color: var(--dim); }
+  .cam .s.busy { color: var(--acc); } .cam .s.ok { color: var(--green); } .cam .s.err { color: var(--red); }
+  .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--red);
+    margin-right: 5px; vertical-align: 1px; }
+  .spin { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--pri-dim);
+    border-top-color: var(--pri); border-radius: 50%; animation: s .8s linear infinite;
+    margin-right: 6px; vertical-align: -1px; }
+  @keyframes s { to { transform: rotate(360deg); } }
+  #more { margin: 4px 12px 10px; color: var(--pri); padding: 6px; cursor: pointer; font: inherit; display: none; }
+  #more:hover { border-color: var(--pri); }
+
+
+  .leaflet-container { background: var(--bg); font: inherit; }
+  .leaflet-interactive:focus { outline: none; }
+  /* Esri's dark canvas is grey; pull it toward the HUD's navy. */
+  .leaflet-tile-pane { filter: sepia(.6) hue-rotate(185deg) saturate(2.4) brightness(.8); }
+  .leaflet-control-attribution { background: rgba(2, 10, 28, .75) !important; color: var(--dim); font-size: 10px; }
+  .leaflet-control-attribution a { color: var(--pri-dim); }
+  .leaflet-bar a, .leaflet-bar a:hover { background: var(--panel); color: var(--pri); border-color: var(--border); }
+  .leaflet-tooltip { background: var(--panel); color: var(--text); border: 1px solid var(--border);
+    box-shadow: none; font: inherit; }
+  .leaflet-tooltip:before { display: none; }
+
+  /* cameras on the map: a live dot each; grouped with their count when far */
+  #count { padding: 6px 10px; color: var(--text); white-space: nowrap; }
+  #count b { color: var(--red); }
+  #count .b { color: var(--dim); margin-left: 6px; }
+  .wc-pin { width: 12px; height: 12px; border-radius: 50%; background: var(--red);
+    border: 2px solid #ffd0d8; box-shadow: 0 0 8px var(--red); }
+  .wc-pin.on { background: var(--green); border-color: #c9ffe9; box-shadow: 0 0 10px var(--green); }
+  .wc-cl { display: flex; align-items: center; justify-content: center; border-radius: 50%;
+    background: rgba(255, 51, 85, .22); border: 2px solid var(--red); color: #fff;
+    font-weight: 700; box-shadow: 0 0 12px rgba(255, 51, 85, .55); }
+  .wc-cl span { text-shadow: 0 0 4px #000; }
+  .wc-tip { display: flex; gap: 8px; align-items: center; max-width: 320px; }
+  .wc-tip img { width: 112px; height: 63px; object-fit: cover; border-radius: 2px; background: #000; flex: none; }
+  .wc-tip .t { white-space: normal; font-size: 12px; line-height: 1.3; }
+  .wc-tip .p { color: var(--dim); font-size: 11px; margin-top: 3px; }
+
+  @media (max-width: 680px) {
+    #app { flex-direction: column; }
+    #side { width: auto; height: 42%; border-left: 0; border-top: 1px solid var(--border); }
+    #goto { width: 150px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="mapwrap">
+    <div id="map"></div>
+    <div id="bar">
+      <div id="crumbs" class="box"></div>
+      <div id="count" class="box" title="Câmeras ao vivo marcadas no mapa"></div>
+      <input id="goto" class="box" placeholder="Ir para… (cidade, praia, país)" autocomplete="off">
+    </div>
+    <div id="chips"></div>
+  </div>
+  <div id="side">
+    <h2 id="ptitle">Câmeras ao vivo</h2>
+    <div id="status"></div>
+    <div id="hint"></div>
+    <div id="list"></div>
+    <button id="more" class="box">↻ Procurar de novo</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+<script>
+"use strict";
+const Q = new URLSearchParams(location.search);
+const TOKEN = Q.get("t") || "";
+const api = (name, q = {}) =>
+  fetch(`/api/${name}?` + new URLSearchParams({ ...q, t: TOKEN }))
+    .then(r => r.json())
+    .catch(e => ({ ok: false, error: String(e) }));
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+// Hand-set bounds: the countries' own extents drag a continent across the
+// globe (France reaches South America through French Guiana).
+const CONT = {
+  "Africa":        { pt: "África",          b: [[-36, -19], [38, 53]] },
+  "Europe":        { pt: "Europa",          b: [[34, -25], [71, 45]] },
+  "Asia":          { pt: "Ásia",            b: [[-11, 40], [60, 150]] },
+  "North America": { pt: "América do Norte", b: [[7, -170], [72, -52]] },
+  "South America": { pt: "América do Sul",  b: [[-56, -82], [13, -34]] },
+  "Oceania":       { pt: "Oceania",         b: [[-48, 110], [0, 180]] },
+  "Antarctica":    { pt: "Antártida",       b: [[-85, -180], [-62, 180]] },
+};
+const WORLD = [[-58, -170], [78, 190]];
+
+// No tile fade: Leaflet drops the previous zoom's tiles only once a fade ends,
+// and a label layer kept both — Bogota printed twice, at two sizes.
+const map = L.map("map", { zoomControl: false, worldCopyJump: true, minZoom: 2, fadeAnimation: false,
+                           maxBounds: [[-88, -260], [88, 260]] });
+L.control.zoom({ position: "bottomright" }).addTo(map);
+// Esri's dark canvas: no key needed (CARTO's now answers "API key required").
+// The labels are a separate layer, drawn above the country shapes.
+const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/";
+map.createPane("labels").style.zIndex = 450;
+map.getPane("labels").style.pointerEvents = "none";
+L.tileLayer(ESRI + "World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+  maxZoom: 16,
+  attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a>, HERE, Garmin, &copy; OpenStreetMap · Natural Earth',
+}).addTo(map);
+L.tileLayer(ESRI + "World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}", {
+  maxZoom: 16, pane: "labels",
+}).addTo(map);
+map.fitBounds(WORLD);
+
+// Leaflet's flyTo divides by the distance travelled, so flying to where the
+// map already is throws "Invalid LatLng (NaN, NaN)". Skip those.
+// A map with no size yet (the page still laying out) makes the same NaN: then
+// jump without animation, and never let a failed move stop the rest.
+function fly(b, o = {}) {
+  b = L.latLngBounds(b);
+  try {
+    const sz = map.getSize();
+    if (!sz.x || !sz.y) { map.invalidateSize(); return map.fitBounds(b, { animate: false }); }
+    const pad = L.point(o.padding || [0, 0]);
+    const z = Math.min(map.getBoundsZoom(b, false, pad.multiplyBy(2)), o.maxZoom ?? 99);
+    if (map.getZoom() === z && map.getCenter().distanceTo(b.getCenter()) < 1000) return;
+    map.flyToBounds(b, { duration: 0.8, ...o });
+  } catch (e) {
+    try { map.fitBounds(b, { animate: false }); } catch (_) {}
+  }
+}
+function flyPt(ll, z) {
+  try {
+    if (map.getZoom() === z && map.getCenter().distanceTo(ll) < 1000) return;
+    map.flyTo(ll, z, { duration: 0.8 });
+  } catch (e) {
+    try { map.setView(ll, z, { animate: false }); } catch (_) {}
+  }
+}
+window.addEventListener("resize", () => map.invalidateSize());
+
+// level: world → continent → country → place
+const S = { level: "world", cont: null, country: null, place: null };
+let countries = null, byCode = {}, placeMarker = null, camSeq = 0, lastQuery = null;
+
+function mainBounds(f) {
+  // The largest polygon only, so the USA means the lower 48, not Alaska + Guam.
+  const g = f.geometry, polys = g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+  let best = null, area = -1;
+  for (const poly of polys) {
+    const b = L.latLngBounds(poly[0].map(([x, y]) => [y, x]));
+    const a = (b.getNorth() - b.getSouth()) * (b.getEast() - b.getWest());
+    if (a > area) { area = a; best = b; }
+  }
+  return best;
+}
+
+function style(f) {
+  const p = f.properties;
+  const sel = S.country && S.country.properties === p;
+  const inCont = S.cont && p.CONTINENT === S.cont;
+  const lit = S.level === "world" || inCont;
+  // Zoomed into a city, the coarse 110m border cuts across the sea: keep it faint.
+  const near = S.level === "place";
+  return { color: sel ? "#4db8ff" : "#2a72c9", weight: sel && !near ? 2 : 0.7,
+           opacity: near ? 0.3 : (sel || lit ? 0.85 : 0.25),
+           fillColor: "#4db8ff", fillOpacity: sel ? 0.08 : (lit ? 0.05 : 0) };
+}
+
+function hover(f, on) {
+  if (!countries) return;
+  if (S.level === "world") {
+    const c = f.properties.CONTINENT;
+    countries.eachLayer(l => {
+      if (l.feature.properties.CONTINENT === c) l.setStyle({ fillOpacity: on ? 0.22 : style(l.feature).fillOpacity });
+    });
+  } else {
+    countries.eachLayer(l => {
+      if (l.feature === f) l.setStyle({ fillOpacity: on ? 0.18 : style(f).fillOpacity });
+    });
+  }
+}
+
+function tip(layer) {
+  const p = layer.feature.properties;
+  if (S.level === "world") return (CONT[p.CONTINENT] || {}).pt || p.CONTINENT;
+  return p.NAME_PT || p.NAME_EN;
+}
+
+function onCountryClick(e) {
+  const f = e.target.feature, p = f.properties;
+  L.DomEvent.stopPropagation(e);
+  if ((S.country && S.country.properties === p && S.level !== "continent") || map.getZoom() >= 5) {
+    return pickPoint(e.latlng);
+  }
+  if (S.level === "world" && CONT[p.CONTINENT]) return goCont(p.CONTINENT);
+  return goCountry(f);
+}
+
+function restyle() { if (countries) countries.setStyle(style); }
+
+// ── breadcrumbs, chips, panel ──────────────────────────────────────────────
+function crumbs() {
+  const parts = [`<a data-go="world">MUNDO</a>`];
+  if (S.cont) parts.push(`<a data-go="cont">${esc(CONT[S.cont].pt.toUpperCase())}</a>`);
+  if (S.country) parts.push(`<a data-go="country">${esc((S.country.properties.NAME_PT || "").toUpperCase())}</a>`);
+  if (S.place) parts.push(`<span>${esc(S.place.label)}</span>`);
+  $("crumbs").innerHTML = parts.join('<span class="sep">›</span>');
+  $("chips").innerHTML = S.level === "world"
+    ? Object.entries(CONT).map(([k, v]) => `<button class="chip box" data-cont="${esc(k)}">${esc(v.pt)}</button>`).join("")
+    : "";
+}
+$("crumbs").addEventListener("click", e => {
+  const go = e.target.dataset.go;
+  if (go === "world") goWorld();
+  else if (go === "cont") goCont(S.cont);
+  else if (go === "country") goCountry(S.country);
+});
+$("chips").addEventListener("click", e => { if (e.target.dataset.cont) goCont(e.target.dataset.cont); });
+
+function hint(html) { $("hint").innerHTML = html || ""; }
+function status(html) { $("status").innerHTML = html || ""; }
+
+function clearPlace() {
+  if (placeMarker) { map.removeLayer(placeMarker); placeMarker = null; }
+  S.place = null;
+}
+
+function resetPanel(title) {
+  camSeq++;
+  $("ptitle").textContent = title;
+  $("list").innerHTML = "";
+  $("more").style.display = "none";
+  status("");
+}
+
+// ── navigation ─────────────────────────────────────────────────────────────
+function goWorld() {
+  Object.assign(S, { level: "world", cont: null, country: null });
+  clearPlace(); restyle(); crumbs();
+  fly(WORLD);
+  resetPanel("Câmeras ao vivo");
+  hint("Escolha um <b>continente</b> no mapa ou nos botões abaixo. Depois um <b>país</b>, " +
+       "e então clique numa <b>cidade</b> para ver as câmeras ao vivo de lá.<br><br>" +
+       "Ou digite um lugar em <b>Ir para…</b>");
+}
+
+function goCont(c) {
+  if (!CONT[c]) return;
+  Object.assign(S, { level: "continent", cont: c, country: null });
+  clearPlace(); restyle(); crumbs();
+  fly(CONT[c].b);
+  resetPanel(CONT[c].pt);
+  hint(`Escolha um <b>país</b> em ${esc(CONT[c].pt)}.`);
+}
+
+function goCountry(f, opts = {}) {
+  const p = f.properties;
+  Object.assign(S, { level: "country", cont: p.CONTINENT, country: f });
+  clearPlace(); restyle(); crumbs();
+  if (!opts.noFly) fly(mainBounds(f), { padding: [30, 30] });
+  hint(`Clique numa <b>cidade</b> em ${esc(p.NAME_PT)} para câmeras de lá. Abaixo, as de todo o país.`);
+  loadCams(p.NAME_PT, p.NAME_EN);
+}
+
+function countryEn(code) {
+  const f = byCode[code];
+  return f ? f.properties.NAME_EN : "";
+}
+
+function setPlace(r, latlng) {
+  const f = byCode[r.country_code];
+  if (f) Object.assign(S, { cont: f.properties.CONTINENT, country: f });
+  S.level = "place";
+  S.place = r;
+  if (placeMarker) map.removeLayer(placeMarker);
+  placeMarker = L.circleMarker(latlng || [r.lat, r.lon], {
+    radius: 7, color: "#ff8a2a", weight: 2, fillColor: "#ff8a2a", fillOpacity: 0.35 }).addTo(map);
+  restyle(); crumbs();
+  hint("");
+  const en = r.name_en || r.label;
+  const ce = countryEn(r.country_code);
+  loadCams(r.label, ce && ce !== en ? `${en} ${ce}` : en, latlng || L.latLng(r.lat, r.lon));
+}
+
+async function pickPoint(latlng) {
+  resetPanel("…");
+  hint("");
+  status('<span class="spin"></span>identificando o lugar…');
+  const r = await api("reverse", { lat: latlng.lat.toFixed(5), lon: latlng.lng.toFixed(5) });
+  if (!r.ok) { $("ptitle").textContent = "—"; status(esc(r.error || "Nenhum lugar aqui.")); return; }
+  setPlace(r, latlng);
+  if (map.getZoom() < 9) flyPt(latlng, 9);
+}
+
+async function goTo(text) {
+  text = text.trim();
+  if (!text) return;
+  const t = text.toLowerCase();
+  const cont = Object.keys(CONT).find(k => k.toLowerCase() === t || CONT[k].pt.toLowerCase() === t);
+  if (cont) return goCont(cont);
+  const f = countries && countries.getLayers().map(l => l.feature).find(x =>
+    [x.properties.NAME_PT, x.properties.NAME_EN].some(n => (n || "").toLowerCase() === t));
+  if (f) return goCountry(f);
+
+  resetPanel("…");
+  hint("");
+  status('<span class="spin"></span>procurando o lugar…');
+  const r = await api("geocode", { q: text });
+  if (!r.ok) { $("ptitle").textContent = "—"; status("Lugar não encontrado."); return; }
+  if (r.bbox) {
+    const [s, n, w, e] = r.bbox;
+    fly([[s, w], [n, e]], { maxZoom: 12 });
+  } else {
+    flyPt(L.latLng(r.lat, r.lon), 11);
+  }
+  setPlace(r);
+}
+$("goto").addEventListener("keydown", e => { if (e.key === "Enter") { goTo(e.target.value); e.target.blur(); } });
+
+// ── cameras (YouTube live) ─────────────────────────────────────────────────
+async function loadCams(label, query, at) {
+  resetPanel(label);
+  lastQuery = [label, query, at];
+  const seq = camSeq;
+  status('<span class="spin"></span>procurando câmeras ao vivo…');
+  // with the place's point, the cameras that name it also go on the map
+  const r = await api("cams", at ? { q: query, label, lat: at.lat, lon: at.lng } : { q: query, label });
+  if (at) loadMapCams();
+  if (seq !== camSeq) return;              // the user has already moved on
+  $("more").style.display = "block";
+  if (!r.ok) { status(esc(r.error || "A busca falhou.")); return; }
+  if (!r.cams.length) {
+    status("Nenhuma câmera ao vivo aqui agora. Tente uma cidade maior, ou um ponto turístico em Ir para…");
+    return;
+  }
+  status(`${r.cams.length} transmissões ao vivo`);
+  $("list").innerHTML = r.cams.map(c => `
+    <div class="cam" data-id="${esc(c.id)}" data-title="${esc(c.title)}">
+      <img loading="lazy" src="https://i.ytimg.com/vi/${esc(c.id)}/mqdefault_live.jpg"
+           onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${esc(c.id)}/mqdefault.jpg'">
+      <div><div class="t">${esc(c.title)}</div><div class="s"><span class="dot"></span>AO VIVO</div></div>
+    </div>`).join("");
+}
+$("more").addEventListener("click", () => { if (lastQuery) loadCams(...lastQuery); });
+
+$("list").addEventListener("click", async e => {
+  const el = e.target.closest(".cam");
+  if (!el) return;
+  const s = el.querySelector(".s");
+  s.className = "s busy";
+  s.innerHTML = '<span class="spin"></span>abrindo no HUD…';
+  const r = await api("play", { id: el.dataset.id, title: el.dataset.title });
+  if (r.ok) { s.className = "s ok"; s.textContent = "▶ no ar"; }
+  else { s.className = "s err"; s.textContent = r.error || "Não abriu."; }
+});
+
+// ── cameras on the map (YouTube lives pinned on the place they show) ───────
+// Far away they group, with the count; closer in they split, one dot each.
+const camLayer = L.markerClusterGroup({
+  showCoverageOnHover: false, maxClusterRadius: 48, spiderfyOnMaxZoom: true,
+  disableClusteringAtZoom: 14,
+  iconCreateFunction: cl => {
+    const n = cl.getChildCount();
+    const d = n < 10 ? 30 : n < 50 ? 38 : n < 200 ? 46 : 56;
+    return L.divIcon({ html: `<span>${n}</span>`, className: "wc-cl",
+                       iconSize: [d, d], iconAnchor: [d / 2, d / 2] });
+  },
+}).addTo(map);
+const camPins = {};                 // id → marker
+const pinIcon = L.divIcon({ className: "wc-pin", iconSize: [12, 12], iconAnchor: [6, 6] });
+let mapCamsTimer = null;
+
+function camTip(c) {
+  return `<div class="wc-tip"><img src="https://i.ytimg.com/vi/${esc(c.id)}/mqdefault_live.jpg"
+    onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${esc(c.id)}/mqdefault.jpg'">
+    <div><div class="t"><span class="dot"></span>${esc(c.title)}</div><div class="p">${esc(c.place)}</div></div></div>`;
+}
+
+async function playPin(c, m) {
+  resetPanel(c.place);
+  hint("");
+  status('<span class="spin"></span>abrindo no HUD…');
+  const r = await api("play", { id: c.id, title: c.title });
+  if (r.ok) {
+    status(`▶ no ar: ${esc(c.title)}`);
+    Object.values(camPins).forEach(x => x._icon && x._icon.classList.remove("on"));
+    if (m._icon) m._icon.classList.add("on");
+  } else {
+    status(esc(r.error || "Não abriu."));
+  }
+}
+
+async function loadMapCams() {
+  clearTimeout(mapCamsTimer);
+  const r = await api("pins");
+  if (r.ok) {
+    const want = new Set();
+    for (const c of r.cams || []) {
+      want.add(c.id);
+      if (camPins[c.id]) continue;
+      const m = L.marker([c.lat, c.lon], { icon: pinIcon, title: "" })
+        .bindTooltip(camTip(c), { direction: "top", offset: [0, -6] })
+        .on("click", ev => { L.DomEvent.stopPropagation(ev); playPin(c, m); });
+      camPins[c.id] = m;
+      camLayer.addLayer(m);
+    }
+    for (const id of Object.keys(camPins)) {
+      if (!want.has(id)) { camLayer.removeLayer(camPins[id]); delete camPins[id]; }
+    }
+    const n = Object.keys(camPins).length;
+    $("count").innerHTML = `📍 <b>${n.toLocaleString("pt-BR")}</b> câmeras no mapa` +
+      (r.building ? `<span class="b"><span class="spin"></span>mapeando ${r.done}/${r.total}</span>` : "");
+  }
+  // while the world is being mapped, look again soon; then now and then
+  mapCamsTimer = setTimeout(loadMapCams, r.ok && r.building ? 3000 : 60000);
+}
+
+// Escape goes back up one level.
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape" || document.activeElement === $("goto")) return;
+  if (S.level === "place" && S.country) return goCountry(S.country);
+  if (S.level === "country" && S.cont) return goCont(S.cont);
+  if (S.level !== "world") return goWorld();
+});
+
+// ── start ──────────────────────────────────────────────────────────────────
+map.on("click", e => { if (map.getZoom() >= 5) pickPoint(e.latlng); });
+
+(async () => {
+  goWorld();
+  status('<span class="spin"></span>carregando o mapa…');
+  try {
+    const gj = await fetch("/countries.geojson").then(r => r.json());
+    gj.features = gj.features.filter(f => f.properties.CONTINENT !== "Seven seas (open ocean)");
+    countries = L.geoJSON(gj, {
+      style,
+      onEachFeature: (f, layer) => {
+        if (f.properties.ISO_A2_EH && f.properties.ISO_A2_EH !== "-99") byCode[f.properties.ISO_A2_EH] = f;
+        layer.bindTooltip(tip, { sticky: true });
+        layer.on({ click: onCountryClick,
+                   mouseover: () => hover(f, true), mouseout: () => hover(f, false) });
+      },
+    }).addTo(map);
+    status("");
+  } catch (e) {
+    status("Não consegui carregar os países: " + esc(e));
+  }
+  loadMapCams();
+  if (Q.get("place")) goTo(Q.get("place"));
+})();
+</script>
+</body>
+</html>

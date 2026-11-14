@@ -1,0 +1,517 @@
+# Backup do NODES — sem credenciais
+
+Gerado em 13/11/2026 22:08 a partir de `D:\Mark-LV-main`.
+
+## O que foi retirado
+Todas as chaves, senhas, tokens e dados pessoais. Os arquivos abaixo NÃO estão
+neste backup (eles são recriados pelo próprio assistente, ou você os informa de novo):
+
+- `android/.gradle/8.7/checksums/checksums.lock`
+- `android/.gradle/8.7/checksums/md5-checksums.bin`
+- `android/.gradle/8.7/checksums/sha1-checksums.bin`
+- `android/.gradle/8.7/dependencies-accessors/gc.properties`
+- `android/.gradle/8.7/executionHistory/executionHistory.bin`
+- `android/.gradle/8.7/executionHistory/executionHistory.lock`
+- `android/.gradle/8.7/fileChanges/last-build.bin`
+- `android/.gradle/8.7/fileHashes/fileHashes.bin`
+- `android/.gradle/8.7/fileHashes/fileHashes.lock`
+- `android/.gradle/8.7/fileHashes/resourceHashesCache.bin`
+- `android/.gradle/8.7/gc.properties`
+- `android/.gradle/buildOutputCleanup/buildOutputCleanup.lock`
+- `android/.gradle/buildOutputCleanup/cache.properties`
+- `android/.gradle/buildOutputCleanup/outputFiles.bin`
+- `android/.gradle/file-system.probe`
+- `android/.gradle/vcs-1/gc.properties`
+- `android/local.properties`
+- `client_secret_….json`
+- `config/api_keys.json`
+- `config/app_devices.json`
+- `config/certs/jarvis.crt`
+- `config/certs/jarvis.key`
+- `config/certs/tailscale.crt`
+- `config/certs/tailscale.key`
+- `config/client_secret_….json`
+- `config/token_google_calendar.json`
+- `memory/agenda.json`
+- `memory/alexa/.storage/alexa_media.….cookies`
+- `memory/alexa/auth.json`
+- `memory/backups/long_term-20261025-102734.json`
+- `memory/backups/memory-20261101-165211.db`
+- `memory/backups/memory-20261102-154207.db`
+- `memory/backups/memory-20261103-191030.db`
+- `memory/backups/memory-20261105-185442.db`
+- `memory/backups/memory-20261107-102553.db`
+- `memory/backups/memory-20261108-084835.db`
+- `memory/backups/memory-20261109-220652.db`
+- `memory/backups/memory-20261111-191609.db`
+- `memory/backups/memory-20261112-190639.db`
+- `memory/backups/memory-20261113-190449.db`
+- `memory/conversation.json`
+- `memory/ewelink_token.json`
+- `memory/learning_state.json`
+- `memory/long_term.migrated.json`
+- `memory/memory.db`
+- `memory/memory.db-shm`
+- `memory/memory.db-wal`
+- `memory/smart_home.json`
+- `memory/spotify_token.json`
+- `memory/voiceprint.json`
+- `memory/voiceprint.npy`
+- `tools/LibreHardwareMonitor/LibreHardwareMonitor.config`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Crashpad/metadata`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Crashpad/settings.dat`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/CrashpadMetrics-active.pma`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/CrashpadMetrics.pma`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Account Web Data`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Account Web Data-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Affiliation Database`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Affiliation Database-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/BookmarkMergedSurfaceOrdering`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Cache/Cache_Data/data_0`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Cache/Cache_Data/data_1`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Cache/Cache_Data/data_2`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Cache/Cache_Data/data_3`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Cache/Cache_Data/index`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Cache/No_Vary_Search/journal.baj`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Cache/No_Vary_Search/snapshot.baf`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/ClientCertificates/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/ClientCertificates/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/ClientCertificates/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Code Cache/js/ba678a2fbd8c358c_0`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Code Cache/js/index`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Code Cache/js/index-dir/the-real-index`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Code Cache/wasm/index`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Code Cache/wasm/index-dir/the-real-index`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/DawnGraphiteCache/data_0`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/DawnGraphiteCache/data_1`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/DawnGraphiteCache/data_2`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/DawnGraphiteCache/data_3`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/DawnGraphiteCache/index`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/DawnWebGPUCache/data_0`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/DawnWebGPUCache/data_1`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/DawnWebGPUCache/data_2`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/DawnWebGPUCache/data_3`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/DawnWebGPUCache/index`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension Rules/000003.log`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension Rules/CURRENT`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension Rules/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension Rules/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension Rules/MANIFEST-000001`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension Scripts/000003.log`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension Scripts/CURRENT`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension Scripts/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension Scripts/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension Scripts/MANIFEST-000001`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension State/000003.log`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension State/CURRENT`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension State/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension State/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension State/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Extension State/MANIFEST-000001`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Favicons`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Favicons-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/GPUCache/data_0`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/GPUCache/data_1`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/GPUCache/data_2`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/GPUCache/data_3`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/GPUCache/index`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/History`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/History-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Local Storage/leveldb/000003.log`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Local Storage/leveldb/CURRENT`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Local Storage/leveldb/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Local Storage/leveldb/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Local Storage/leveldb/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Local Storage/leveldb/MANIFEST-000001`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Login Data`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Login Data For Account`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Login Data For Account-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Login Data-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Network/Cookies`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Network/Cookies-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Network/Device Bound Sessions`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Network/Device Bound Sessions-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Network/Network Persistent State`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Network/NetworkDataMigrated`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Network/Reporting and NEL`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Network/Reporting and NEL-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Network/TransportSecurity`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Network/Trust Tokens`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Network/Trust Tokens-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/PersistentOriginTrials/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/PersistentOriginTrials/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/PersistentOriginTrials/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Preferences`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/README`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Safe Browsing Network/NetworkDataMigrated`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Secure Preferences`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Segmentation Platform/SegmentInfoDB/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Segmentation Platform/SegmentInfoDB/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Segmentation Platform/SegmentInfoDB/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Segmentation Platform/SignalDB/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Segmentation Platform/SignalDB/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Segmentation Platform/SignalDB/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Segmentation Platform/SignalStorageConfigDB/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Segmentation Platform/SignalStorageConfigDB/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Segmentation Platform/SignalStorageConfigDB/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/ServerCertificate`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/ServerCertificate-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Service Worker/Database/000003.log`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Service Worker/Database/CURRENT`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Service Worker/Database/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Service Worker/Database/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Service Worker/Database/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Service Worker/Database/MANIFEST-000001`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Service Worker/ScriptCache/2cc80dabc69f58b6_0`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Service Worker/ScriptCache/4cb013792b196a35_0`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Service Worker/ScriptCache/4cb013792b196a35_1`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Service Worker/ScriptCache/index`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Service Worker/ScriptCache/index-dir/the-real-index`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Session Storage/000003.log`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Session Storage/CURRENT`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Session Storage/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Session Storage/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Session Storage/MANIFEST-000001`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Sessions/Session_13436740815133877`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Sessions/Session_13436740913637316`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Sessions/Tabs_13436740815135585`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Sessions/Tabs_13436740913638780`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Shared Dictionary/cache/index`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Shared Dictionary/cache/index-dir/the-real-index`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Shared Dictionary/db`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Shared Dictionary/db-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Site Characteristics Database/000003.log`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Site Characteristics Database/CURRENT`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Site Characteristics Database/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Site Characteristics Database/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Site Characteristics Database/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Site Characteristics Database/MANIFEST-000001`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Sync Data/LevelDB/000003.log`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Sync Data/LevelDB/CURRENT`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Sync Data/LevelDB/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Sync Data/LevelDB/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Sync Data/LevelDB/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Sync Data/LevelDB/MANIFEST-000001`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Top Sites`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Top Sites-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Web Data`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/Web Data-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/WebStorage/QuotaManager`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/WebStorage/QuotaManager-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/chrome_cart_db/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/chrome_cart_db/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/chrome_cart_db/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/commerce_subscription_db/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/commerce_subscription_db/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/commerce_subscription_db/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/declarative_performance_observer.db`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/declarative_performance_observer.db-journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/discount_infos_db/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/discount_infos_db/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/discount_infos_db/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/discounts_db/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/discounts_db/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/discounts_db/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/parcel_tracking_db/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/parcel_tracking_db/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/parcel_tracking_db/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/shared_proto_db/000003.log`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/shared_proto_db/CURRENT`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/shared_proto_db/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/shared_proto_db/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/shared_proto_db/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/shared_proto_db/MANIFEST-000001`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/shared_proto_db/metadata/000003.log`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/shared_proto_db/metadata/CURRENT`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/shared_proto_db/metadata/LOCK`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/shared_proto_db/metadata/LOG`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/shared_proto_db/metadata/LOG.old`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Default/shared_proto_db/metadata/MANIFEST-000001`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GPUPersistentCache/DawnGraphiteCache/NR2GNA44OGQUBFRRNDBXIX2VC7JXKYAS/cache.db`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GPUPersistentCache/DawnGraphiteCache/NR2GNA44OGQUBFRRNDBXIX2VC7JXKYAS/cache.db-wal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GPUPersistentCache/DawnGraphiteCache/NR2GNA44OGQUBFRRNDBXIX2VC7JXKYAS/cache.journal`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GrShaderCache/data_0`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GrShaderCache/data_1`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GrShaderCache/data_2`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GrShaderCache/data_3`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GrShaderCache/f_000001`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GrShaderCache/f_000002`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GrShaderCache/f_000003`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GrShaderCache/f_000004`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GrShaderCache/f_000005`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GrShaderCache/f_000006`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GrShaderCache/f_000007`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GrShaderCache/f_000008`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GrShaderCache/f_000009`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/GrShaderCache/index`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Last Version`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Local State`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/ShaderCache/data_0`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/ShaderCache/data_1`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/ShaderCache/data_2`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/ShaderCache/data_3`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/ShaderCache/index`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/Variations`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/VariationsSafeSeedV2`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/VariationsSeedV2`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/extensions_crx_cache/metadata.json`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/.chrome-profile/segmentation_platform/ukm_db`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/build.mjs`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/meta.json`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/page.html`
+- `tools/anatomy/mark/como-funciona-um-cache-lru-o-item-menos-bdcb87/shot.png`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Crashpad/metadata`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Crashpad/settings.dat`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/CrashpadMetrics-active.pma`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/CrashpadMetrics.pma`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Account Web Data`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Account Web Data-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Affiliation Database`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Affiliation Database-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/BookmarkMergedSurfaceOrdering`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Cache/Cache_Data/data_0`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Cache/Cache_Data/data_1`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Cache/Cache_Data/data_2`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Cache/Cache_Data/data_3`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Cache/Cache_Data/index`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Cache/No_Vary_Search/journal.baj`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Cache/No_Vary_Search/snapshot.baf`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/ClientCertificates/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/ClientCertificates/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/ClientCertificates/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Code Cache/js/ba678a2fbd8c358c_0`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Code Cache/js/index`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Code Cache/js/index-dir/the-real-index`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Code Cache/wasm/index`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Code Cache/wasm/index-dir/the-real-index`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/DawnGraphiteCache/data_0`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/DawnGraphiteCache/data_1`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/DawnGraphiteCache/data_2`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/DawnGraphiteCache/data_3`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/DawnGraphiteCache/index`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/DawnWebGPUCache/data_0`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/DawnWebGPUCache/data_1`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/DawnWebGPUCache/data_2`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/DawnWebGPUCache/data_3`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/DawnWebGPUCache/index`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension Rules/000003.log`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension Rules/CURRENT`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension Rules/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension Rules/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension Rules/MANIFEST-000001`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension Scripts/000003.log`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension Scripts/CURRENT`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension Scripts/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension Scripts/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension Scripts/MANIFEST-000001`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension State/000003.log`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension State/CURRENT`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension State/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension State/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension State/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Extension State/MANIFEST-000001`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Favicons`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Favicons-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/GPUCache/data_0`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/GPUCache/data_1`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/GPUCache/data_2`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/GPUCache/data_3`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/GPUCache/index`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/History`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/History-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Local Storage/leveldb/000003.log`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Local Storage/leveldb/CURRENT`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Local Storage/leveldb/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Local Storage/leveldb/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Local Storage/leveldb/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Local Storage/leveldb/MANIFEST-000001`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Login Data`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Login Data For Account`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Login Data For Account-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Login Data-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Network/Cookies`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Network/Cookies-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Network/Device Bound Sessions`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Network/Device Bound Sessions-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Network/Network Persistent State`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Network/NetworkDataMigrated`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Network/Reporting and NEL`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Network/Reporting and NEL-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Network/TransportSecurity`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Network/Trust Tokens`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Network/Trust Tokens-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/PersistentOriginTrials/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/PersistentOriginTrials/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/PersistentOriginTrials/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Preferences`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/README`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Safe Browsing Network/NetworkDataMigrated`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Secure Preferences`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Segmentation Platform/SegmentInfoDB/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Segmentation Platform/SegmentInfoDB/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Segmentation Platform/SegmentInfoDB/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Segmentation Platform/SignalDB/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Segmentation Platform/SignalDB/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Segmentation Platform/SignalDB/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Segmentation Platform/SignalStorageConfigDB/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Segmentation Platform/SignalStorageConfigDB/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Segmentation Platform/SignalStorageConfigDB/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/ServerCertificate`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/ServerCertificate-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Service Worker/Database/000003.log`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Service Worker/Database/CURRENT`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Service Worker/Database/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Service Worker/Database/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Service Worker/Database/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Service Worker/Database/MANIFEST-000001`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Service Worker/ScriptCache/ba23d8ecda68de77_0`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Service Worker/ScriptCache/ba23d8ecda68de77_1`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Service Worker/ScriptCache/f1cdccba37924bda_0`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Service Worker/ScriptCache/index`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Service Worker/ScriptCache/index-dir/the-real-index`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Session Storage/000003.log`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Session Storage/CURRENT`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Session Storage/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Session Storage/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Session Storage/MANIFEST-000001`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Sessions/Session_13438120694149630`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Sessions/Session_13438120856624262`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Sessions/Tabs_13438120694151051`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Sessions/Tabs_13438120856625833`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Sessions_Encrypted/Session_13438120694150266`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Sessions_Encrypted/Session_13438120856625484`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Sessions_Encrypted/Tabs_13438120694151388`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Sessions_Encrypted/Tabs_13438120856626074`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Shared Dictionary/cache/index`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Shared Dictionary/cache/index-dir/the-real-index`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Shared Dictionary/db`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Shared Dictionary/db-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Site Characteristics Database/000003.log`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Site Characteristics Database/CURRENT`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Site Characteristics Database/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Site Characteristics Database/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Site Characteristics Database/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Site Characteristics Database/MANIFEST-000001`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Sync Data/LevelDB/000003.log`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Sync Data/LevelDB/CURRENT`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Sync Data/LevelDB/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Sync Data/LevelDB/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Sync Data/LevelDB/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Sync Data/LevelDB/MANIFEST-000001`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Top Sites`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Top Sites-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Web Data`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/Web Data-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/WebStorage/QuotaManager`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/WebStorage/QuotaManager-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/chrome_cart_db/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/chrome_cart_db/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/chrome_cart_db/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/commerce_subscription_db/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/commerce_subscription_db/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/commerce_subscription_db/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/declarative_performance_observer.db`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/declarative_performance_observer.db-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/discount_infos_db/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/discount_infos_db/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/discount_infos_db/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/discounts_db/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/discounts_db/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/discounts_db/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/parcel_tracking_db/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/parcel_tracking_db/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/parcel_tracking_db/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/shared_proto_db/000003.log`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/shared_proto_db/CURRENT`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/shared_proto_db/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/shared_proto_db/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/shared_proto_db/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/shared_proto_db/MANIFEST-000001`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/shared_proto_db/metadata/000003.log`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/shared_proto_db/metadata/CURRENT`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/shared_proto_db/metadata/LOCK`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/shared_proto_db/metadata/LOG`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/shared_proto_db/metadata/LOG.old`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Default/shared_proto_db/metadata/MANIFEST-000001`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GPUPersistentCache/DawnGraphiteCache/6ENT453JBM7P4HRBJFQZ6ZSIB2QSEPXH/cache.db`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GPUPersistentCache/DawnGraphiteCache/6ENT453JBM7P4HRBJFQZ6ZSIB2QSEPXH/cache.db-wal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GPUPersistentCache/DawnGraphiteCache/6ENT453JBM7P4HRBJFQZ6ZSIB2QSEPXH/cache.journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/data_0`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/data_1`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/data_2`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/data_3`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/f_000001`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/f_000002`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/f_000003`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/f_000004`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/f_000005`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/f_000006`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/f_000007`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/f_000008`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/f_000009`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/f_00000a`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/f_00000b`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/f_00000c`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/f_00000d`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/f_00000e`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/GrShaderCache/index`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Last Version`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Local State`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/ShaderCache/data_0`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/ShaderCache/data_1`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/ShaderCache/data_2`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/ShaderCache/data_3`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/ShaderCache/index`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Affiliation Database`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Affiliation Database-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Favicons`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Favicons-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/History`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/History-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Login Data`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Login Data For Account`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Login Data For Account-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Login Data-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Preferences`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Secure Preferences`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Sessions/Session_13436741422404861`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Sessions/Session_13436741547495758`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Sessions/Tabs_13436741422406423`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Sessions/Tabs_13436741547497476`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Top Sites`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Top Sites-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Web Data`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Default/Web Data-journal`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Last Version`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Snapshots/155.0.8059.82/Local State`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/Variations`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/VariationsSafeSeedV2`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/VariationsSeedV2`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/extensions_crx_cache/metadata.json`
+- `tools/anatomy/mark/motor-de-carro-aa022a/.chrome-profile/segmentation_platform/ukm_db`
+- `tools/anatomy/mark/motor-de-carro-aa022a/build.mjs`
+- `tools/anatomy/mark/motor-de-carro-aa022a/meta.json`
+- `tools/anatomy/mark/motor-de-carro-aa022a/page.html`
+- `tools/anatomy/mark/motor-de-carro-aa022a/shot.png`
+- `memory/holo_cache/` (imagens geradas)
+- `logs/`, `__pycache__/`, saída de build do Android
+
+`config/api_keys.example.json` tem a mesma estrutura do seu `api_keys.json`, com
+todas as chaves e dados pessoais em branco; só ficaram preferências sem segredo
+(cor, voz, tela do HUD, ajustes de turno…).
+
+## Para restaurar
+1. Descompacte numa pasta.
+2. Renomeie `config/api_keys.example.json` para `config/api_keys.json` e preencha
+   a chave do Gemini (ou abra o assistente e use a tela de configuração).
+3. `pip install -r requirements.txt`
+4. Refaça os logins que precisam de navegador: Google (Central de Módulos →
+   E-mail / Briefing Diário), Spotify, eWeLink, Alexa, iCloud (senha de app).
+5. A memória (o que ele aprendeu) não vem neste backup, porque tem dados pessoais
+   e a palavra-chave de segurança.

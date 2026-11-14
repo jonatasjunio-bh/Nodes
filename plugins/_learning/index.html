@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aprendizado</title>
+<style>
+  /* The HUD's palette, with the golden sphere's amber for what was learned. */
+  :root {
+    --bg: #020a1c; --panel: #061433; --panel2: #08183d; --border: #16397a;
+    --pri: #4db8ff; --pri-dim: #2a72c9; --gold: #ffa21c; --hot: #ffcd69; --text: #cfe9ff;
+    --dim: #5f86c2; --red: #ff3355; --green: #3dffb0;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 13px Bahnschrift, "Segoe UI", sans-serif; }
+  body { overflow: hidden; }
+  #app { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(320px, 1fr); height: 100%; gap: 0; }
+  .col { overflow-y: auto; min-height: 0; padding: 12px; }
+  .col + .col { border-left: 1px solid var(--border); background: var(--panel); }
+  h2 { margin: 4px 0 8px; font-size: 13px; color: var(--pri); letter-spacing: .06em; text-transform: uppercase;
+    font-weight: 600; display: flex; align-items: baseline; gap: 8px; }
+  h2 small { color: var(--dim); font-weight: 400; letter-spacing: 0; text-transform: none; }
+  .box { background: rgba(6, 20, 51, .92); border: 1px solid var(--border); border-radius: 4px; }
+  #stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+  .stat { padding: 8px 10px; }
+  .stat b { display: block; font-size: 20px; color: var(--hot); font-weight: 600; }
+  .stat span { color: var(--dim); font-size: 11px; }
+  #growth { padding: 8px; margin-bottom: 14px; }
+  #growth svg { width: 100%; height: 90px; display: block; }
+  #chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .chip { color: var(--pri); padding: 4px 10px; border-radius: 12px; cursor: pointer; font: inherit; font-size: 12px; }
+  .chip.on { background: var(--pri-dim); color: #fff; }
+  .ev { padding: 8px 10px; margin-bottom: 6px; border-left: 3px solid var(--border); }
+  .ev.focus { border-left-color: var(--hot); box-shadow: 0 0 0 1px var(--hot); }
+  .ev .top { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  .ev .when { color: var(--dim); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .ev .cat { font-size: 10px; letter-spacing: .06em; padding: 1px 6px; border-radius: 8px; background: var(--panel2);
+    color: var(--hot); }
+  .ev .key { color: #fff; }
+  .ev .src { margin-left: auto; font-size: 11px; color: var(--dim); }
+  .ev .src.correction { color: var(--green); }
+  .ev .src.assistant { color: var(--hot); }
+  .ev .val { margin-top: 4px; line-height: 1.4; }
+  .ev .old { margin-top: 3px; color: var(--dim); font-size: 12px; text-decoration: line-through; }
+  .ev .del { color: var(--red); }
+  .undo { background: none; border: 1px solid var(--border); color: var(--dim); border-radius: 10px; padding: 1px 8px;
+    cursor: pointer; font: inherit; font-size: 11px; }
+  .undo:hover { color: var(--red); border-color: var(--red); }
+  .les { padding: 8px 10px; margin-bottom: 6px; }
+  .les .k { color: #fff; display: flex; gap: 6px; align-items: center; }
+  .les .k .n { margin-left: auto; font-size: 11px; padding: 1px 7px; border-radius: 8px; }
+  .les .n.ok { color: var(--green); background: rgba(61, 255, 176, .1); }
+  .les .n.bad { color: var(--red); background: rgba(255, 51, 85, .12); }
+  .les .v { margin-top: 3px; line-height: 1.4; }
+  .les .d { margin-top: 3px; color: var(--dim); font-size: 11px; }
+  .hab { padding: 8px 10px; margin-bottom: 6px; }
+  .hab .k { color: #fff; display: flex; justify-content: space-between; cursor: pointer; }
+  .hab .k small { color: var(--dim); }
+  .hab .k small.l { color: var(--green); }
+  .hab .v { margin-top: 3px; line-height: 1.4; }
+  .hab .hist { display: none; margin-top: 6px; border-top: 1px solid var(--border); padding-top: 6px; }
+  .hab.open .hist { display: block; }
+  .hab .hist div { margin-bottom: 6px; font-size: 12px; }
+  .hab .hist .when { color: var(--dim); font-size: 11px; }
+  #cats { display: grid; grid-template-columns: 1fr auto; gap: 3px 10px; padding: 8px 10px; margin-bottom: 14px; }
+  #cats span:nth-child(even) { color: var(--hot); text-align: right; font-variant-numeric: tabular-nums; }
+  .empty { color: var(--dim); padding: 6px; }
+  #toast { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); padding: 8px 14px; display: none; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="col">
+    <div id="stats"></div>
+    <h2>Crescimento <small>sinapses da esfera, dia a dia</small></h2>
+    <div id="growth" class="box"></div>
+    <h2>Linha do tempo <small>tudo o que mudou na memória, do mais novo ao mais antigo</small></h2>
+    <div id="chips"></div>
+    <div id="timeline"></div>
+  </div>
+  <div class="col">
+    <h2>Lições <small>regras que você ensinou · quantas vezes ele errou de novo</small></h2>
+    <div id="lessons"></div>
+    <h2 style="margin-top:14px">Hábitos <small>como ele faz cada tarefa · clique para ver as mudanças</small></h2>
+    <div id="habits"></div>
+    <h2 style="margin-top:14px">O que ele sabe <small>por categoria</small></h2>
+    <div id="cats" class="box"></div>
+  </div>
+</div>
+<div id="toast" class="box"></div>
+
+<script>
+"use strict";
+const Q = new URLSearchParams(location.search);
+const TOKEN = Q.get("t") || "";
+const api = (name, q = {}) => fetch(`/api/${name}?` + new URLSearchParams({ ...q, t: TOKEN }))
+  .then(r => r.json()).catch(e => ({ ok: false, error: String(e) }));
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const CATS = { lessons: "LIÇÃO", habits: "HÁBITO", identity: "IDENTIDADE", home: "CASA", preferences: "PREFERÊNCIAS",
+  preference: "PREFERÊNCIAS", relationships: "PESSOAS", projects: "PROJETOS", wishes: "DESEJOS", notes: "NOTAS",
+  personal: "PESSOAL", monitors: "MONITORADOS" };
+const SRC = { correction: "sua correção", assistant: "ele guardou", user: "você", consolidation: "arrumação diária",
+  default: "padrão", import: "importado", app: "app", revert: "desfeito" };
+const HAB = { greeting: "Saudação", briefing: "Resumo do dia", topic_alerts: "Alertas de tópicos",
+  notices: "Avisos dos apps", still_working: "\"Ainda verificando\"", goodbye: "Despedida" };
+const when = ts => ts ? `${ts.slice(8, 10)}/${ts.slice(5, 7)} ${ts.slice(11, 16)}` : "";
+const pretty = k => String(k || "").replace(/_/g, " ");
+let D = null, filter = "all";
+
+function toast(t) { const el = $("toast"); el.textContent = t; el.style.display = "block";
+  setTimeout(() => el.style.display = "none", 3500); }
+
+function render() {
+  const s = D.stats;
+  $("stats").innerHTML = [
+    [s.synapses, "sinapses na esfera"], [s.entries, "coisas que ele sabe"], [s.lessons, "lições"],
+    [s.corrections, "correções suas aprendidas"], [s.habits_learned, "hábitos reescritos por você"],
+    [s.week, "mudanças nos últimos 7 dias"],
+  ].map(([n, l]) => `<div class="stat box"><b>${n}</b><span>${l}</span></div>`).join("");
+
+  // growth
+  const g = D.growth;
+  if (g.length > 1) {
+    const min = Math.min(...g.map(x => x.synapses)) - 5, max = Math.max(...g.map(x => x.synapses)) + 5;
+    const W = 600, H = 90, X = i => 30 + i * (W - 40) / (g.length - 1), Y = v => H - 14 - (v - min) / (max - min) * (H - 26);
+    const pts = g.map((x, i) => `${X(i).toFixed(1)},${Y(x.synapses).toFixed(1)}`).join(" ");
+    $("growth").innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+      <polyline points="${pts}" fill="none" stroke="#ffa21c" stroke-width="2"/>
+      ${g.map((x, i) => `<circle cx="${X(i)}" cy="${Y(x.synapses)}" r="3" fill="#ffcd69"><title>${x.day}: ${x.synapses}</title></circle>`).join("")}
+      <text x="4" y="12" fill="#5f86c2" font-size="10">${max - 5}</text><text x="4" y="${H - 4}" fill="#5f86c2" font-size="10">${g[0].day.slice(8)}/${g[0].day.slice(5, 7)}</text>
+      <text x="${W - 4}" y="${H - 4}" fill="#5f86c2" font-size="10" text-anchor="end">hoje · ${g[g.length - 1].synapses}</text></svg>`;
+  } else $("growth").innerHTML = '<div class="empty">Ainda não há dias suficientes.</div>';
+
+  // filters
+  const counts = {};
+  D.timeline.forEach(t => counts[t.source] = (counts[t.source] || 0) + 1);
+  const chips = [["all", "Tudo", D.timeline.length], ["correction", "Suas correções", counts.correction || 0],
+    ["assistant", "Ele guardou", counts.assistant || 0], ["consolidation", "Arrumação diária", counts.consolidation || 0],
+    ["other", "Outros", D.timeline.length - (counts.correction || 0) - (counts.assistant || 0) - (counts.consolidation || 0)]];
+  $("chips").innerHTML = chips.map(([k, l, n]) =>
+    `<button class="chip box${filter === k ? " on" : ""}" data-f="${k}">${l} · ${n}</button>`).join("");
+  timeline();
+
+  // lessons
+  $("lessons").innerHTML = D.lessons.length ? D.lessons.map(l => `
+    <div class="les box"><div class="k">${esc(pretty(l.key))}
+      <span class="n ${l.broken ? "bad" : "ok"}">${l.broken ? `errou de novo ${l.broken}×` : "nunca errou de novo"}</span></div>
+      <div class="v">${esc(l.value)}</div><div class="d">desde ${when(l.created) || l.updated}</div></div>`).join("")
+    : '<div class="empty">Nenhuma lição ainda.</div>';
+
+  // habits
+  $("habits").innerHTML = D.habits.map((h, k) => `
+    <div class="hab box" data-k="${k}"><div class="k"><span>${esc(HAB[h.key] || pretty(h.key))}</span>
+      <small class="${h.learned ? "l" : ""}">${h.learned ? "reescrito por você" : "padrão"} · ${h.changes.length} ${h.changes.length === 1 ? "versão" : "versões"}</small></div>
+      <div class="v">${esc(h.value)}</div>
+      <div class="hist">${h.changes.slice().reverse().map(c => `<div><span class="when">${when(c.ts)} · ${esc(SRC[c.source] || c.source)}</span><br>${esc(c.new)}</div>`).join("")}</div>
+    </div>`).join("") || '<div class="empty">Nenhum hábito ainda.</div>';
+
+  // categories
+  $("cats").innerHTML = Object.entries(D.cats).sort((a, b) => b[1] - a[1])
+    .map(([c, n]) => `<span>${esc(CATS[c] || c.toUpperCase())}</span><span>${n}</span>`).join("");
+}
+
+function timeline() {
+  const known = ["correction", "assistant", "consolidation"];
+  const rows = D.timeline.filter(t => filter === "all" || (filter === "other" ? !known.includes(t.source) : t.source === filter));
+  $("timeline").innerHTML = rows.length ? rows.map(t => `
+    <div class="ev box" id="ev${t.id}">
+      <div class="top"><span class="when">${when(t.ts)}</span><span class="cat">${esc(CATS[t.cat] || t.cat.toUpperCase())}</span>
+        <span class="key">${esc(pretty(t.key))}</span>
+        <span class="src ${esc(t.source)}">${esc(SRC[t.source] || t.source)}</span>
+        <button class="undo" data-id="${t.id}" title="Desfazer esta mudança">↶ desfazer</button></div>
+      ${t.action === "delete" ? `<div class="val del">esqueceu: ${esc(t.old)}</div>`
+        : `<div class="val">${esc(t.new)}</div>${t.old && t.old !== t.new ? `<div class="old">${esc(t.old)}</div>` : ""}`}
+    </div>`).join("") : '<div class="empty">Nada aqui.</div>';
+}
+
+document.addEventListener("click", async e => {
+  const f = e.target.closest("[data-f]");
+  if (f) { filter = f.dataset.f; render(); return; }
+  const h = e.target.closest(".hab .k");
+  if (h) { h.parentElement.classList.toggle("open"); return; }
+  const u = e.target.closest(".undo");
+  if (u) {
+    if (!confirm("Desfazer esta mudança na memória? (fica registrado e pode ser refeito)")) return;
+    const r = await api("revert", { id: u.dataset.id });
+    toast(r.ok ? "Desfeito." : (r.error || "Não deu."));
+    if (r.ok) load();
+  }
+});
+
+async function load() {
+  const r = await api("data");
+  if (!r.ok) { document.body.innerHTML = `<div class="empty">Não consegui ler a memória: ${esc(r.error)}</div>`; return; }
+  D = r; render();
+  const focus = Q.get("focus");
+  if (focus && $("ev" + focus)) {
+    const el = $("ev" + focus); el.classList.add("focus");
+    el.scrollIntoView({ block: "center" });
+  }
+}
+load();
+</script>
+</body>
+</html>

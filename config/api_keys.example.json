@@ -1,0 +1,90 @@
+{
+  "gemini_api_key": "",
+  "os_system": "windows",
+  "assistant_name": "Nodes",
+  "user_name": "",
+  "ui_color": "#4db8ff",
+  "input_device": "",
+  "output_device": "",
+  "morning_brief_enabled": false,
+  "hud_style": "clean",
+  "push_to_talk_enabled": false,
+  "wake_word_enabled": false,
+  "voice_name": "Charon",
+  "plugin_config": {
+    "smart_home": {
+      "ewelink_account": "",
+      "ewelink_password": "",
+      "ewelink_country": "",
+      "ewelink_region": "us",
+      "ewelink_appid": "",
+      "ewelink_appsecret": "",
+      "tuya_api_key": "",
+      "tuya_api_secret": "",
+      "tuya_region": "us",
+      "ewelink_redirect": ""
+    },
+    "daily_briefing": {
+      "city": "",
+      "calendar_urls": "",
+      "icloud_apple_id": "",
+      "icloud_app_password": "",
+      "news_country": "BR",
+      "google_client_file": "",
+      "default_calendar": "google",
+      "google_aliases": "",
+      "icloud_aliases": ""
+    },
+    "spotify": {
+      "client_id": "",
+      "redirect_uri": ""
+    },
+    "remote_access": {
+      "owner_key": ""
+    },
+    "android_phone": {
+      "relay": "on",
+      "relay_apps": ""
+    },
+    "voice_id": {
+      "mode": "off",
+      "threshold": "0,30"
+    },
+    "alexa": {
+      "email": "",
+      "domain": "amazon.com.br"
+    },
+    "brains": {
+      "openai_api_key": "",
+      "provider": "auto",
+      "openai_model": ""
+    },
+    "hwinfo": {
+      "alerts": "desligado",
+      "cpu_max": "",
+      "gpu_max": "",
+      "ssd_max": "",
+      "ram_max": "",
+      "auto_reenable": "sim"
+    },
+    "hud_display": {
+      "target": "hud"
+    },
+    "world_cams": {
+      "windy_key": ""
+    }
+  },
+  "proactive_audio": false,
+  "turn_tuning": {
+    "enabled": true,
+    "silence_ms": 900,
+    "prefix_ms": 200,
+    "end_sensitivity": "low",
+    "start_sensitivity": "default"
+  },
+  "camera_index": 0,
+  "hud_core": "nodes_film",
+  "plugins_enabled": {
+    "daily_briefing": true
+  }
+}

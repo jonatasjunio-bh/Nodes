@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07090f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icon-192.png">
+  <link rel="apple-touch-icon" href="/static/icon-192.png">
+  <title>MARK</title>
+  <script src="/static/crypto.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    .spk-btn { background: none; border: 1px solid rgba(255,255,255,0.12); color: inherit;
+               border-radius: 8px; padding: 4px 8px; margin-left: 8px; font-size: 15px; cursor: pointer; }
+    .spk-btn.off { opacity: 0.35; }
+    :root {
+      --bg:      #07090f;
+      --surface: rgba(255,255,255,0.04);
+      --border:  rgba(255,255,255,0.07);
+      --accent:  #6366f1;
+      --adim:    rgba(99,102,241,0.14);
+      --text:    #dde3ed;
+      --muted:   #5e6a7e;
+      --green:   #22c55e;
+      --gdim:    rgba(34,197,94,0.14);
+    }
+    html, body {
+      height: 100%; background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      flex-shrink: 0; display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      background: rgba(7,9,15,0.95);
+    }
+    .logo { font-size: 15px; font-weight: 700; letter-spacing: 6px; }
+    .logo em { color: var(--accent); font-style: normal; }
+    .pill {
+      display: flex; align-items: center; gap: 6px; padding: 4px 11px;
+      border-radius: 99px; background: var(--surface); border: 1px solid var(--border);
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--muted); transition: all 0.3s;
+    }
+    .pill.on { background: var(--gdim); border-color: rgba(34,197,94,0.3); color: var(--green); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); transition: background 0.3s; }
+    .pill.on .dot { background: var(--green); animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .spacer { flex: 1; }
+    .enc-badge {
+      font-size: 9px; font-weight: 700; letter-spacing: 1.5px; padding: 3px 8px;
+      border-radius: 4px; display: none;
+    }
+    .enc-badge.on  { display: block; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); color: var(--green); }
+    .enc-badge.off { display: block; background: rgba(255,100,100,0.08); border: 1px solid rgba(255,100,100,0.2); color: #f87171; }
+    .url { font-size: 10px; font-family: monospace; color: var(--muted); padding: 4px 9px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; }
+
+    /* ── FEED ── */
+    main { flex: 1; overflow-y: auto; padding: 14px 16px 8px; display: flex; flex-direction: column; gap: 10px; }
+    main::-webkit-scrollbar { width: 3px; }
+    main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .msg { max-width: 82%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.55; animation: pop 0.18s ease; }
+    @keyframes pop { from { opacity:0; transform:translateY(4px); } }
+    .msg-j   { align-self:flex-start; background:var(--adim);   border:1px solid rgba(99,102,241,0.18); border-bottom-left-radius:4px; }
+    .msg-u   { align-self:flex-end;   background:var(--surface); border:1px solid var(--border);        border-bottom-right-radius:4px; }
+    .msg-sys { align-self:center; font-size:11px; color:var(--muted); padding:2px 0; background:transparent; border:none; letter-spacing:0.3px; }
+    .lbl { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; opacity:0.45; margin-bottom:4px; }
+    .msg-j .lbl { color:var(--accent); }
+    .msg-u .lbl { color:var(--muted); text-align:right; }
+
+    /* ── FILE CARD ── */
+    .msg-file {
+      align-self: flex-end;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; border-bottom-right-radius: 4px;
+      padding: 11px 14px; display: flex; align-items: center; gap: 12px;
+      max-width: 82%; animation: pop 0.18s ease;
+    }
+    .fc-icon { font-size: 26px; flex-shrink: 0; }
+    .fc-meta { flex: 1; min-width: 0; }
+    .fc-lbl  { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; opacity:0.45; color:var(--muted); margin-bottom:4px; }
+    .fc-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fc-size { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .fc-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; margin-top: 7px; overflow: hidden; }
+    .fc-bar { height: 100%; width: 0%; background: var(--accent); border-radius: 2px; transition: width 0.12s linear; }
+    .fc-status { font-size: 10px; font-weight: 700; letter-spacing: 1px; flex-shrink: 0; color: var(--muted); }
+    .fc-status.done { color: var(--green); }
+    .fc-status.err  { color: #f87171; }
+    .fc-dl { display:block; margin-top:6px; font-size:11px; color:var(--accent); text-decoration:none; font-weight:600; }
+    .fc-dl:hover { opacity: 0.8; }
+
+    /* ── FOOTER ── */
+    footer { flex-shrink:0; padding:10px 14px; border-top:1px solid var(--border); background:rgba(7,9,15,0.95); display:flex; gap:8px; align-items:center; }
+    #inp { flex:1; padding:11px 14px; background:var(--surface); border:1.5px solid var(--border); border-radius:12px; color:var(--text); font-size:14px; outline:none; transition:border-color 0.15s; }
+    #inp:focus { border-color: var(--accent); }
+    #inp::placeholder { color: var(--muted); }
+    .btn { padding:11px 15px; border:none; border-radius:12px; font-size:11px; font-weight:700; letter-spacing:1.5px; cursor:pointer; transition:opacity 0.15s,transform 0.1s; }
+    .btn:active { transform: scale(0.96); }
+    .btn:hover  { opacity: 0.82; }
+    .btn-send { background: var(--accent); color: #fff; }
+    .btn-wake { background:var(--surface); border:1px solid var(--border); color:var(--muted); display:none; }
+    .btn-wake.show { display:block; color:var(--green); border-color:rgba(34,197,94,0.35); }
+    .btn-attach {
+      background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+      padding: 11px 13px; font-size: 16px; line-height: 1; border-radius: 12px;
+      cursor: pointer; transition: opacity 0.15s, transform 0.1s; display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .btn-attach:hover  { opacity: 0.82; border-color: var(--accent); color: var(--accent); }
+    .btn-attach:active { transform: scale(0.96); }
+
+    /* ── MIC BUTTON ── */
+    #mic-btn {
+      background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+      padding: 11px 13px; font-size: 16px; line-height: 1; border-radius: 12px;
+      cursor: pointer; transition: opacity 0.15s, transform 0.1s, background 0.2s, border-color 0.2s;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    #mic-btn:hover  { opacity: 0.82; border-color: var(--accent); color: var(--accent); }
+    #mic-btn:active { transform: scale(0.96); }
+    #mic-btn.recording {
+      background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.45); color: #ef4444;
+      animation: mic-pulse 1s ease-in-out infinite;
+    }
+    #mic-btn.unsupported { opacity: 0.3; cursor: not-allowed; }
+    @keyframes mic-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.65;transform:scale(0.97)} }
+
+    /* ── TOAST ── */
+    #toast {
+      position:fixed; top:66px; left:50%; transform:translateX(-50%) translateY(-8px);
+      background:rgba(34,197,94,0.16); border:1px solid rgba(34,197,94,0.4);
+      color:var(--green); font-size:12px; font-weight:700; letter-spacing:1px;
+      padding:7px 18px; border-radius:99px;
+      opacity:0; transition:opacity 0.22s,transform 0.22s;
+      pointer-events:none; white-space:nowrap;
+    }
+    #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+
+    /* ── the phone HUD (same structure as the PC's clean HUD) ── */
+    #tabs { flex-shrink: 0; display: flex; gap: 6px; padding: 8px 12px; background: #020a1c;
+            border-bottom: 1px solid rgba(120,190,255,0.14); }
+    #tabs button { flex: 1; min-height: 40px; border-radius: 10px; border: 1px solid rgba(120,190,255,0.18);
+                   background: transparent; color: #8cb8ee; font-size: 12px; font-weight: 700; letter-spacing: 3px; }
+    #tabs button[aria-selected="true"] { background: rgba(77,184,255,0.14); color: #eef7ff; border-color: rgba(120,190,255,0.4); }
+    #hudv { flex: 1; overflow-y: auto; padding: 12px 14px 18px; display: flex; flex-direction: column; gap: 14px;
+            background: radial-gradient(ellipse at 50% 20%, #08204a 0%, #04122e 38%, #020a1c 75%); color: #cfe9ff; }
+    #hudv[hidden], #feed[hidden] { display: none !important; }
+    .hv-top { display: flex; justify-content: space-between; align-items: baseline; }
+    .hv-name { font-size: 18px; font-weight: 700; letter-spacing: 7px; color: #eef7ff; }
+    .hv-on { font: 500 11px ui-monospace, Consolas, monospace; color: #8cb8ee; margin-left: 10px; letter-spacing: 1px; }
+    .hv-on i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #3dffb0; margin-right: 6px;
+               box-shadow: 0 0 6px #3dffb0; }
+    .hv-clock { font-size: 26px; font-weight: 300; color: #eef7ff; font-variant-numeric: tabular-nums; }
+    .hv-date { font: 500 11px ui-monospace, Consolas, monospace; color: #8cb8ee; margin-right: 8px; }
+    .hv-core { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    #hvSyn { width: min(88vw, 380px); height: min(88vw, 380px); }
+    .hv-state { font-size: 12px; font-weight: 700; letter-spacing: 6px; }
+    #hvWave { width: min(80vw, 340px); height: 26px; }
+    .hv-heard { font-size: 16px; font-weight: 300; color: #eef7ff; text-align: center; min-height: 22px; padding: 0 8px; }
+    .hv-ctrls { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+    .hv-ctrls button { min-height: 44px; padding: 0 12px; border-radius: 22px; font-size: 10.5px; font-weight: 700;
+                       letter-spacing: 1.2px; white-space: nowrap; background: rgba(77,184,255,0.08); border: 1px solid rgba(120,190,255,0.26);
+                       color: #cfe9ff; display: flex; align-items: center; gap: 8px; }
+    .hv-ctrls button:disabled { opacity: 0.4; }
+    .hv-glass { border-radius: 16px; padding: 14px 16px 16px; background: linear-gradient(165deg, rgba(77,184,255,0.10), rgba(77,184,255,0.025));
+                border: 1px solid rgba(120,190,255,0.20); box-shadow: inset 0 1px 0 rgba(200,232,255,0.16); }
+    .hv-h { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .hv-h b { font-size: 11.5px; letter-spacing: 3.5px; color: #eef7ff; font-weight: 700; }
+    .hv-h span { font: 500 10.5px ui-monospace, Consolas, monospace; color: #8cb8ee; }
+    .hv-arcs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; text-align: center; }
+    .hv-arcs svg { width: 100%; max-width: 150px; }
+    .hv-lab { font-size: 10.5px; letter-spacing: 2px; color: #8cb8ee; display: flex; justify-content: space-between; margin: 12px 0 6px; }
+    .hv-lab em { font: 500 11.5px ui-monospace, Consolas, monospace; color: #eef7ff; font-style: normal; letter-spacing: 0; }
+    .hv-cores { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; align-items: end; height: 44px; }
+    .hv-cores i { display: block; border-radius: 3px 3px 1px 1px; background: linear-gradient(180deg, #4db8ff, rgba(77,184,255,0.25)); }
+    .hv-segs { display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px; }
+    .hv-segs i { height: 12px; border-radius: 2px; background: rgba(120,190,255,0.14); }
+    .hv-segs i.on { background: #4db8ff; }
+    .hv-bar { height: 6px; border-radius: 3px; background: rgba(120,190,255,0.14); overflow: hidden; }
+    .hv-bar i { display: block; height: 6px; border-radius: 3px; background: linear-gradient(90deg, rgba(77,184,255,0.45), #4db8ff); }
+    .hv-ev { display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid rgba(120,190,255,0.12); }
+    .hv-ev time { font: 500 14px ui-monospace, Consolas, monospace; color: #eef7ff; min-width: 46px; }
+    .hv-ev s { width: 3px; border-radius: 2px; align-self: stretch; text-decoration: none; }
+    .hv-ev div { display: flex; flex-direction: column; min-width: 0; }
+    .hv-ev b { font-size: 15px; font-weight: 400; color: #eef7ff; }
+    .hv-ev small { font-size: 11.5px; color: #8cb8ee; }
+    #hvAgenda { position: relative; max-height: 380px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+    .hv-day { margin-bottom: 8px; }
+    .hv-day > h4 { margin: 4px 0 2px; font-size: 11px; letter-spacing: 2.4px; font-weight: 700; color: #b8d6f5; }
+    .hv-day.past { opacity: 0.45; }
+    .hv-day.today { border: 1px solid rgba(77,184,255,0.45); background: rgba(77,184,255,0.10); border-radius: 10px; padding: 4px 10px 2px; }
+    .hv-day.today > h4 { color: #4db8ff; }
+    .hv-day .hv-ev:first-of-type { border-top: 0; }
+    .hv-free { color: #8cb8ee; font-size: 13.5px; padding: 6px 0 8px; }
+    .hv-leg { display: flex; gap: 12px; font-size: 11px; color: #cfe9ff; }
+    .hv-leg i { display: inline-block; width: 8px; height: 8px; margin-right: 5px; vertical-align: 0; }
+    #hvSheet { position: fixed; inset: 0; z-index: 50; background: rgba(2,10,28,0.72); display: flex; align-items: flex-end; }
+    #hvSheet[hidden] { display: none !important; }
+    #hvSheet .sheet { width: 100%; max-height: 80vh; overflow-y: auto; border-radius: 20px 20px 0 0; padding: 18px 16px 28px;
+                      background: linear-gradient(165deg, #0a2350, #04122e); border-top: 1px solid rgba(120,190,255,0.3); color: #cfe9ff; }
+    .hv-mods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .hv-mods div { border-radius: 12px; padding: 12px; background: rgba(77,184,255,0.06); border: 1px solid rgba(120,190,255,0.16); }
+    .hv-mods b { display: block; font-size: 14px; color: #eef7ff; font-weight: 600; }
+    .hv-mods small { font-size: 11.5px; color: #8cb8ee; }
+
+    /* ── HUD cards mirrored from the PC (core/hud_mirror.py) ── */
+    #hud {
+      flex-shrink: 0; display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden;
+      padding: 10px 12px; border-bottom: 1px solid rgba(77,184,255,0.18);
+      background: linear-gradient(180deg, #020a1c, #04102a);
+      scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+      max-height: 46vh; align-items: flex-start;
+    }
+    #hud[hidden] { display: none !important; }
+    .hc {
+      flex: 0 0 auto; width: min(78vw, 300px); max-height: calc(46vh - 22px); overflow-y: auto;
+      scroll-snap-align: start; position: relative;
+      background: linear-gradient(180deg, rgba(8,24,61,0.92), rgba(2,10,28,0.9));
+      border: 1px solid #16397a; border-radius: 7px; padding: 10px 12px 12px;
+      color: #cfe9ff; animation: hcIn .35s ease-out;
+    }
+    @keyframes hcIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .hc::before, .hc::after { content: ""; position: absolute; width: 10px; height: 10px; border: 0 solid var(--hc, #4db8ff); }
+    .hc::before { top: 3px; left: 3px; border-top-width: 1.6px; border-left-width: 1.6px; }
+    .hc::after { bottom: 3px; right: 3px; border-bottom-width: 1.6px; border-right-width: 1.6px; }
+    .hc-t { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #eef7ff;
+            padding-right: 22px; line-height: 1.3; }
+    .hc-t::after { content: ""; display: block; height: 1px; margin-top: 6px;
+                   background: linear-gradient(90deg, var(--hc, #4db8ff) 0 40px, #16397a 40px); }
+    .hc-x { position: absolute; top: 4px; right: 6px; background: none; border: 0; color: #5f86c2;
+            font-size: 18px; line-height: 1; padding: 4px 6px; cursor: pointer; }
+    .hc-big { font-size: 34px; font-weight: 700; color: #eef7ff; margin-top: 8px; font-variant-numeric: tabular-nums; }
+    .hc-big small { font-size: 14px; color: #8cb8ee; margin-left: 4px; font-weight: 600; }
+    .hc-sub { font-size: 12px; color: #8cb8ee; margin-top: 4px; }
+    .hc-row { display: flex; justify-content: space-between; gap: 10px; padding: 6px 2px; font-size: 13px;
+              border-bottom: 1px solid rgba(22,57,122,0.5); }
+    .hc-row:last-child { border-bottom: 0; }
+    .hc-row b { color: #eef7ff; font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+    .hc-row.link { color: var(--hc, #4db8ff); cursor: pointer; }
+    .hc-row.link b { color: var(--hc, #4db8ff); text-decoration: underline; }
+    .hc-bar { margin-top: 8px; font-size: 12px; }
+    .hc-bar i { display: block; height: 7px; border-radius: 4px; margin-top: 3px;
+                background: linear-gradient(90deg, var(--hc, #4db8ff), #eef7ff); }
+    .hc-text { font-size: 13.5px; line-height: 1.45; margin-top: 8px; white-space: pre-wrap; }
+    .hc-open { display: block; margin-top: 10px; padding: 9px 10px; border-radius: 5px; font-size: 12.5px;
+               font-weight: 700; letter-spacing: 1px; color: var(--hc, #4db8ff); background: rgba(77,184,255,0.12);
+               text-decoration: underline; cursor: pointer; border: 0; width: 100%; text-align: left; }
+    .hc-holo { display: block; width: 100%; max-height: 210px; object-fit: contain; margin-top: 8px;
+               filter: drop-shadow(0 0 10px rgba(77,184,255,0.55)); }
+    .hc svg { display: block; width: 100%; max-height: 120px; }
+    .hc-photo { display: block; width: 100%; max-height: 320px; object-fit: contain; margin-top: 8px;
+                border-radius: 6px; border: 1px solid rgba(120,190,255,0.25); }
+  </style>
+</head>
+<body>
+  <div id="toast"></div>
+  <header>
+    <div class="logo"><em>J</em>ARVIS</div>
+    <div class="pill" id="pill"><span class="dot"></span><span id="st">Connecting</span></div>
+    <div class="enc-badge" id="enc">AES-256</div>
+    <button class="spk-btn" id="spk-btn" onclick="toggleSpeaker()" title="Assistant's voice on this phone">🔊</button>
+    <a class="spk-btn" id="apk-link" href="/app.apk" style="display:none;text-decoration:none" title="Install the Android app">📲</a>
+    <div class="spacer"></div>
+    <div class="url">__IP__:__PORT__</div>
+  </header>
+  <section id="hud" hidden aria-label="Cartões do HUD"></section>
+  <nav id="tabs" role="tablist">
+    <button id="tabHud" role="tab" aria-selected="true">HUD</button>
+    <button id="tabChat" role="tab" aria-selected="false">CONVERSA</button>
+  </nav>
+  <section id="hudv" aria-label="HUD do assistente">
+    <div class="hv-top">
+      <div><span class="hv-name" id="hvName">NODES</span><span class="hv-on" id="hvOn"><i></i>ONLINE</span></div>
+      <div><span class="hv-date" id="hvDate"></span><span class="hv-clock" id="hvClock"></span></div>
+    </div>
+    <div class="hv-core">
+      <canvas id="hvSyn" aria-label="Núcleo do assistente" role="img"></canvas>
+      <div class="hv-state" id="hvState">OUVINDO</div>
+      <canvas id="hvWave" aria-hidden="true"></canvas>
+      <div class="hv-heard" id="hvHeard"></div>
+    </div>
+    <div class="hv-ctrls">
+      <button id="hvMic" aria-label="Microfone do PC"><span id="hvMicTxt">MIC ATIVO</span></button>
+      <button id="hvInt" disabled>■ INTERROMPER</button>
+      <button id="hvMod">▦ MÓDULOS</button>
+    </div>
+    <section class="hv-glass" id="hvPerf"><div class="hv-h"><b>DESEMPENHO</b><span>SENSORES AO VIVO</span></div><div id="hvPerfBody">Aguardando o PC…</div></section>
+    <section class="hv-glass"><div class="hv-h" style="flex-wrap:wrap"><b id="hvAgTitle">AGENDA · HOJE</b>
+      <span class="hv-leg" style="flex-basis:100%;margin-top:6px"><span><i style="background:#4db8ff;border-radius:50%"></i>Pessoal</span><span><i style="background:#ffd24a;border-radius:2px"></i>Compartilhada</span></span></div>
+      <div id="hvAgenda"></div></section>
+    <section class="hv-glass"><div class="hv-h"><b>REDE</b><span id="hvNetTxt"></span></div><svg id="hvNet" viewBox="0 0 200 40" preserveAspectRatio="none" style="width:100%;height:40px"></svg></section>
+  </section>
+  <div id="hvSheet" hidden><div class="sheet" role="dialog" aria-label="Módulos">
+    <div class="hv-h"><b>MÓDULOS</b><button id="hvSheetClose" style="min-height:40px;padding:0 14px;border-radius:20px;border:1px solid rgba(120,190,255,0.3);background:transparent;color:#cfe9ff">VOLTAR AO HUD</button></div>
+    <div class="hv-mods" id="hvMods"></div></div></div>
+  <main id="feed" hidden></main>
+  <footer>
+    <input id="inp" placeholder="Send a command to JARVIS…" autocomplete="off">
+    <label class="btn-attach" for="file-inp" title="Send file">📎</label>
+    <input type="file" id="file-inp" multiple accept="*/*" style="display:none">
+    <button id="mic-btn" onclick="doMic()" title="Voice command">🎤</button>
+    <button class="btn btn-wake" id="wake" onclick="doWake()">WAKE</button>
+    <button class="btn btn-send" onclick="doSend()">SEND</button>
+  </footer>
+
+  <script>
+    // ── Auth — bearer token ───────────────────────────────────────────────────
+    const _authToken  = sessionStorage.getItem('jarvis_token');
+    const _sessionKey = sessionStorage.getItem('jarvis_key');
+
+    if (!_authToken) {
+      location.replace('/login');
+    }
+
+    function _authHeader() { return { 'Authorization': `Bearer ${_authToken}` }; }
+    function _authFetch(url, opts = {}) {
+      opts.headers = Object.assign({}, opts.headers, _authHeader());
+      return fetch(url, opts);
+    }
+
+    // ── AES-256-CBC encryption (CryptoJS) ────────────────────────────────────
+    const _AES_SALT = 'JARVIS-DASHBOARD-v1';
+    let _aesKey = null;
+
+    function _initCrypto(key) {
+      if (typeof CryptoJS === 'undefined') return false;
+      _aesKey = CryptoJS.SHA256(key + _AES_SALT);
+      return true;
+    }
+
+    function _encrypt(plaintext) {
+      if (!_aesKey || typeof CryptoJS === 'undefined') return null;
+      try {
+        const iv  = CryptoJS.lib.WordArray.random(16);
+        const enc = CryptoJS.AES.encrypt(
+          CryptoJS.enc.Utf8.parse(plaintext), _aesKey,
+          { iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
+        );
+        const ivHex = iv.toString(CryptoJS.enc.Hex);
+        const ctHex = enc.ciphertext.toString(CryptoJS.enc.Hex);
+        const hex   = ivHex + ctHex;
+        const bytes = new Uint8Array(hex.length / 2);
+        for (let i = 0; i < bytes.length; i++)
+          bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+        return btoa(String.fromCharCode(...bytes));
+      } catch { return null; }
+    }
+
+    const _encReady = _sessionKey ? _initCrypto(_sessionKey) : false;
+    const encBadge  = document.getElementById('enc');
+    if (_encReady) { encBadge.className = 'enc-badge on'; }
+    else           { encBadge.className = 'enc-badge off'; encBadge.textContent = 'NO ENC'; }
+
+    // ── WebSocket ─────────────────────────────────────────────────────────────
+    const feed  = document.getElementById('feed');
+    const pill  = document.getElementById('pill');
+    const stTxt = document.getElementById('st');
+    const wake  = document.getElementById('wake');
+
+    const _wsProto = location.protocol === 'https:' ? 'wss' : 'ws';
+    const _wsUrl   = `${_wsProto}://${location.host}/ws?token=${encodeURIComponent(_authToken)}`;
+    const ws       = new WebSocket(_wsUrl);
+
+    ws.onopen    = () => { sys('Remote session active.'); toast('Connected to JARVIS'); };
+    ws.onclose   = () => sys('Connection lost — refresh to reconnect.');
+    ws.onerror   = () => sys('Connection error.');
+    ws.onmessage = (e) => {
+      const m = JSON.parse(e.data);
+      if (m.type === 'log')           append(m.speaker, m.text);
+      if (m.type === 'status')        setStatus(m.state);
+      if (m.type === 'wake')          sys('Wake word detected — connecting…');
+      if (m.type === 'sys')           sys(m.text);
+      if (m.type === 'file_received') _onFileReceived(m);
+      if (m.type === 'hud')           hudApply(m);
+      if (m.type === 'hudstate')      hvUpdate(m.d);
+    };
+
+
+
+    // ── the phone HUD: the PC's clean HUD, live (core/hud_data.py) ───────────
+    const $ = id => document.getElementById(id);
+    let hv = null;                                   // last numbers from the PC
+    const HV_C = {main: '#4db8ff', green: '#3dffb0', yellow: '#ffd24a', orange: '#ff8a2a', red: '#ff3366', dim: '#5f86c2'};
+    function hvState() {
+      if (!hv) return {txt: 'CONECTANDO', col: HV_C.dim, rate: 0.6, chain: 0.05};
+      if (hv.muted) return {txt: 'MICROFONE DESLIGADO', col: HV_C.red, rate: 0.4, chain: 0.05};
+      if (hv.speaking) return {txt: 'FALANDO', col: HV_C.orange, rate: 4.5, chain: 0.2};
+      if (hv.state === 'THINKING' || hv.state === 'PROCESSING') return {txt: 'PENSANDO', col: HV_C.yellow, rate: 6, chain: 0.42};
+      if (hv.state === 'SLEEPING') return {txt: 'DORMINDO', col: HV_C.dim, rate: 0.4, chain: 0.05};
+      return {txt: 'OUVINDO', col: HV_C.green, rate: 1.8, chain: 0.15};
+    }
+    function hvTab(which) {
+      const hud = which === 'hud';
+      $('hudv').hidden = !hud; $('feed').hidden = hud;
+      $('tabHud').setAttribute('aria-selected', String(hud)); $('tabChat').setAttribute('aria-selected', String(!hud));
+      try { localStorage.setItem('mark_tab', which); } catch (_) {}
+      if (!hud) { const f = $('feed'); f.scrollTop = f.scrollHeight; }
+    }
+    $('tabHud').onclick = () => hvTab('hud');
+    $('tabChat').onclick = () => hvTab('chat');
+    try { if (localStorage.getItem('mark_tab') === 'chat') hvTab('chat'); } catch (_) {}
+    $('hvInt').onclick = () => { try { ws.send(JSON.stringify({type: 'control', action: 'interrupt'})); } catch (_) {} };
+    $('hvMic').onclick = () => { try { ws.send(JSON.stringify({type: 'control', action: 'mute'})); } catch (_) {} };
+    $('hvMod').onclick = () => { $('hvSheet').hidden = false; };
+    $('hvSheetClose').onclick = () => { $('hvSheet').hidden = true; };
+    $('hvSheet').onclick = e => { if (e.target.id === 'hvSheet') $('hvSheet').hidden = true; };
+
+    const _W = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'], _M = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+    function hvClock() {
+      const d = new Date();
+      $('hvClock').textContent = d.toTimeString().slice(0, 5);
+      $('hvDate').textContent = `${_W[d.getDay()]} · ${String(d.getDate()).padStart(2, '0')} ${_M[d.getMonth()]}`;
+    }
+    hvClock(); setInterval(hvClock, 10000);
+
+    function hvArc(load, temp, name, model) {
+      const C = 2 * Math.PI * 50, c2 = 2 * Math.PI * 39;
+      const l = Math.max(0, Math.min(1, (load || 0) / 100)), t = temp == null ? 0 : Math.max(0, Math.min(1, temp / 100));
+      const tc = temp >= 85 ? HV_C.red : temp >= 75 ? HV_C.orange : HV_C.green;
+      return `<div><svg viewBox="0 0 120 112" aria-hidden="true">
+        <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(120,190,255,0.16)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(C*0.75).toFixed(1)} ${C.toFixed(1)}" transform="rotate(135 60 60)"/>
+        <circle cx="60" cy="60" r="50" fill="none" stroke="${HV_C.main}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(C*0.75*l).toFixed(1)} ${C.toFixed(1)}" transform="rotate(135 60 60)"/>
+        <circle cx="60" cy="60" r="39" fill="none" stroke="${tc}" stroke-width="3" stroke-linecap="round" stroke-dasharray="${(c2*0.75*t).toFixed(1)} ${c2.toFixed(1)}" transform="rotate(135 60 60)"/>
+        <text x="60" y="64" text-anchor="middle" fill="#eef7ff" font-size="26" font-weight="300">${temp == null ? '--' : Math.round(temp) + '°'}</text>
+        <text x="60" y="82" text-anchor="middle" fill="#8cb8ee" font-size="10" font-family="Consolas, monospace">${Math.round(load || 0)}% CARGA</text></svg>
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#eef7ff">${name}</div>
+        <div style="font-size:10.5px;color:#8cb8ee">${_esc(model || '')}</div></div>`;
+    }
+    function hvLine(series, h, stroke, dashed, fill) {
+      if (!series || series.length < 2) return '';
+      const mx = Math.max(100, ...series.map(Number).filter(isFinite));
+      const pts = series.map((v, i) => `${(i / (series.length - 1) * 200).toFixed(1)},${(h - (Number(v) || 0) / mx * h).toFixed(1)}`);
+      return (fill ? `<path d="M${pts.join('L')}L200,${h}L0,${h}Z" fill="${stroke}" opacity="0.14"/>` : '') +
+        `<polyline points="${pts.join(' ')}" fill="none" stroke="${stroke}" stroke-width="1.3" ${dashed ? 'stroke-dasharray="3 3"' : ''} vector-effect="non-scaling-stroke"/>`;
+    }
+    function hvUpdate(d) {
+      hv = d || {};
+      $('hvName').textContent = String(hv.name || 'NODES').toUpperCase();
+      const st = hvState();
+      $('hvState').textContent = st.txt; $('hvState').style.color = st.col;
+      $('hvHeard').textContent = hv.muted ? 'Microfone do PC desligado' : '';
+      $('hvMicTxt').textContent = hv.muted ? 'MIC DESLIGADO' : 'MIC ATIVO';
+      $('hvMic').style.color = hv.muted ? '#ff6f8f' : HV_C.green;
+      $('hvMic').style.borderColor = hv.muted ? 'rgba(255,51,102,0.45)' : 'rgba(61,255,176,0.35)';
+      $('hvInt').disabled = !hv.speaking;
+      $('hvInt').style.color = '#ffb27a';
+      const c = hv.cpu || {}, g = hv.gpu || {}, m = hv.mem || {}, s = hv.ssd || {}, n = hv.net || {};
+      const cores = (c.cores || []).slice(0, 16).map(v => `<i style="height:${Math.max(3, Math.round(v / 100 * 44))}px"></i>`).join('');
+      const used = Math.round(24 * (m.pct || 0) / 100);
+      const segs = Array.from({length: 24}, (_, i) => `<i class="${i < used ? 'on' : ''}"></i>`).join('');
+      const vram = g.vram_used != null ? `${(g.vram_used / 1024).toFixed(1)} / ${((g.vram_total || 0) / 1024).toFixed(0)} GB` : '--';
+      const vfrac = g.vram_total ? g.vram_used / g.vram_total : 0;
+      const ssdx = [s.temp != null ? Math.round(s.temp) + '°' : '', s.life != null ? 'vida ' + Math.round(s.life) + '%' : ''].filter(Boolean).join(' · ');
+      $('hvPerfBody').innerHTML =
+        `<div class="hv-arcs">${hvArc(c.load, c.temp, 'CPU', c.name)}${hvArc(g.load, g.temp, 'GPU', (g.name || '').replace('NVIDIA GeForce ', ''))}</div>
+         <div class="hv-lab">NÚCLEOS <em>${c.clock ? (c.clock / 1000).toFixed(2).replace('.', ',') + ' GHz' : ''}${c.power ? ' · ' + Math.round(c.power) + ' W' : ''}</em></div>
+         <div class="hv-cores">${cores}</div>
+         <div class="hv-lab">CARGA · 60 S <em><span style="color:#4db8ff">— CPU</span> &nbsp;┄ GPU</em></div>
+         <svg viewBox="0 0 200 40" preserveAspectRatio="none" style="width:100%;height:56px">${hvLine(hv.cpu_hist, 40, '#4db8ff', false, true)}${hvLine(hv.gpu_hist, 40, '#8cb8ee', true, false)}</svg>
+         <div class="hv-lab">MEMÓRIA <em>${(m.used_gb || 0).toFixed(1).replace('.', ',')} / ${Math.round(m.total_gb || 0)} GB${(m.temps || []).length ? ' · ' + m.temps.map(t => Math.round(t) + '°').join(' ') : ''}</em></div>
+         <div class="hv-segs">${segs}</div>
+         <div class="hv-lab">VRAM <em>${vram.replace(/\./g, ',')}</em></div><div class="hv-bar"><i style="width:${Math.max(2, vfrac * 100)}%"></i></div>
+         <div class="hv-lab">SSD <em>${s.pct != null ? Math.round(s.pct) + '%' : '--'}${ssdx ? ' · ' + ssdx : ''}</em></div><div class="hv-bar"><i style="width:${Math.max(2, s.pct || 0)}%"></i></div>`;
+      // the whole month, day by day (each day grouped by calendar), today highlighted
+      const month = (hv.month && hv.month.length) ? hv.month
+        : [{label: 'HOJE', today: true, past: false, events: hv.agenda || []}];
+      $('hvAgTitle').textContent = hv.month_name ? `AGENDA · ${hv.month_name}` : 'AGENDA · HOJE';
+      const agHtml = month.map(d => {
+        const evs = (d.events || []).map(e => {
+          const k = e.kind === 'compartilhada' ? 'Compartilhada' : e.kind === 'pessoal' ? 'Pessoal' : 'Nota';
+          const col = e.kind === 'compartilhada' ? HV_C.yellow : e.kind === 'pessoal' ? HV_C.main : '#8cb8ee';
+          return `<div class="hv-ev"><time>${e.time === 'dia todo' ? 'dia' : _esc(e.time)}</time><s style="background:${col}"></s>
+            <div><b>${_esc(e.title)}</b><small>${k}${e.calendar ? ' · ' + _esc(e.calendar) : ''}</small></div></div>`;
+        }).join('') || `<div class="hv-free">${d.today ? 'Nada marcado para hoje' : 'Livre'}</div>`;
+        const lab = _esc(d.label) + (d.today && d.label !== 'HOJE' ? ' · HOJE' : '');
+        return `<div class="hv-day${d.today ? ' today' : ''}${d.past ? ' past' : ''}"><h4>${lab}</h4>${evs}</div>`;
+      }).join('');
+      const agBox = $('hvAgenda');
+      if (agBox._html !== agHtml) {          // only when it changed: keeps the user's scroll
+        agBox._html = agHtml;
+        agBox.innerHTML = agHtml;
+      }
+      if (!agBox._placed && agBox.offsetHeight) {   // first time it is on screen: today at the top
+        const t = agBox.querySelector('.hv-day.today');
+        if (t) { agBox.scrollTop = t.offsetTop; agBox._placed = true; }
+      }
+      $('hvNetTxt').textContent = `↓ ${(n.down || 0).toFixed(1)} · ↑ ${(n.up || 0).toFixed(1)} Mbps${n.ping ? ' · ' + Math.round(n.ping) + ' ms' : ''}`;
+      const nh = hv.net_hist || [], nmax = Math.max(1, ...nh);
+      $('hvNet').innerHTML = nh.length > 1 ? `<polyline points="${nh.map((v, i) => `${(i / (nh.length - 1) * 200).toFixed(1)},${(38 - v / nmax * 34).toFixed(1)}`).join(' ')}" fill="none" stroke="#4db8ff" stroke-width="1.2" vector-effect="non-scaling-stroke"/>` : '';
+      const mods = hv.modules || [];
+      $('hvMods').innerHTML = mods.map(mo => `<div><b>${_esc(mo.name)}</b><small>${_esc(mo.note || 'Ativo')}</small></div>`).join('');
+      $('hvMod').textContent = `▦ MÓDULOS ${mods.length || ''}`;
+    }
+
+    // the synapse core, animated (same idea as core/neural_organic.py)
+    (function () {
+      const cv = $('hvSyn'), ctx = cv.getContext('2d'), wv = $('hvWave'), wx = wv.getContext('2d');
+      let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+      const N = 52, nodes = [];
+      while (nodes.length < N) {
+        const x = rnd() * 2 - 1, y = rnd() * 2 - 1, z = rnd() * 2 - 1;
+        if (x * x / 1.0 + y * y / 0.62 + z * z / 0.8 <= 1 && !(Math.abs(x) < 0.05 && y > -0.2))
+          nodes.push({x, y: y * 0.85, z, ph: rnd() * 6.28, glow: 0});
+      }
+      const edges = [];
+      nodes.forEach((a, i) => {
+        nodes.map((b, j) => [(a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2, j]).sort((p, q) => p[0] - q[0])
+          .slice(1, 4).forEach(([, j]) => { if (!edges.some(e => e.i === j && e.j === i)) edges.push({i, j, b: rnd() * 0.9 - 0.45, ph: rnd() * 6.28}); });
+      });
+      const adj = nodes.map(() => []); edges.forEach((e, k) => { adj[e.i].push(k); adj[e.j].push(k); });
+      let pulses = [], yaw = 0, last = performance.now(), spawnAcc = 0;
+      const ease = k => k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
+      function spawn(i) {
+        if (pulses.length > 60 || !adj[i].length) return;
+        const k = adj[i][Math.floor(rnd() * adj[i].length)], e = edges[k];
+        pulses.push({k, rev: e.i !== i, t: 0, life: 0.8 + rnd() * 0.8}); nodes[i].glow = Math.min(1, nodes[i].glow + 0.5);
+      }
+      function frame(now) {
+        const dt = Math.min(0.05, (now - last) / 1000); last = now;
+        const dpr = Math.min(2, devicePixelRatio || 1), S = Math.round(cv.clientWidth * dpr);
+        if (!S) { requestAnimationFrame(frame); return; }
+        if (cv.width !== S) { cv.width = cv.height = S; }
+        const st = hvState(), c = S / 2, R = S * 0.46;
+        yaw += dt * (st.txt === 'PENSANDO' ? 0.22 : 0.11);
+        spawnAcc += dt * st.rate;
+        while (spawnAcc > 1) { spawnAcc -= 1; spawn(Math.floor(rnd() * N)); }
+        ctx.clearRect(0, 0, S, S);
+        // ring, scale, live arcs
+        const g = ctx.createRadialGradient(c, c, 0, c, c, R);
+        g.addColorStop(0, 'rgba(77,184,255,0.14)'); g.addColorStop(0.6, 'rgba(77,184,255,0.04)'); g.addColorStop(1, 'rgba(77,184,255,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(c, c, R, 0, 7); ctx.fill();
+        ctx.strokeStyle = 'rgba(22,57,122,0.9)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(c, c, R, 0, 7); ctx.stroke();
+        ctx.strokeStyle = 'rgba(29,78,163,0.85)';
+        for (let a = 0; a < 360; a += 6) {
+          if (a % 90 === 0) continue;
+          const maj = a % 30 === 0, r1 = R - (maj ? 16 : 9) * dpr, r2 = R - 4 * dpr, ca = Math.cos(a * Math.PI / 180), sa = Math.sin(a * Math.PI / 180);
+          ctx.beginPath(); ctx.moveTo(c + r1 * ca, c + r1 * sa); ctx.lineTo(c + r2 * ca, c + r2 * sa); ctx.stroke();
+        }
+        ctx.lineCap = 'round'; ctx.lineWidth = 2.5 * dpr;
+        const cpu = ((hv && hv.cpu && hv.cpu.load) || 0) / 100;
+        ctx.strokeStyle = HV_C.main; ctx.beginPath(); ctx.arc(c, c, R + 6 * dpr, -Math.PI * 0.72, -Math.PI * 0.72 + 0.3 + 2.1 * cpu); ctx.stroke();
+        const sp = st.txt === 'FALANDO' ? 1.2 + 0.4 * Math.sin(now / 160) : st.txt === 'OUVINDO' ? 0.6 : 0.45;
+        const a0 = 0.6 + now / 1000 * 0.15;
+        ctx.strokeStyle = st.col; ctx.beginPath(); ctx.arc(c, c, R + 6 * dpr, a0, a0 + sp); ctx.stroke();
+        // network
+        const r = R * 0.62, cy = Math.cos(yaw), sy = Math.sin(yaw), t = now / 1000;
+        const P = nodes.map(nd => {
+          const x = nd.x + 0.035 * Math.sin(t * 0.8 + nd.ph), y = nd.y + 0.035 * Math.cos(t * 0.7 + nd.ph), z = nd.z;
+          const x1 = x * cy + z * sy, z1 = -x * sy + z * cy, k = 3.2 / (3.2 + z1);
+          return [c + x1 * r * k, c + y * r * k, (1 - z1) / 2];
+        });
+        const ctl = edges.map(e => {
+          const A = P[e.i], B = P[e.j], bend = e.b + 0.18 * Math.sin(t * 0.9 + e.ph);
+          return [(A[0] + B[0]) / 2 - (B[1] - A[1]) * bend * 0.5, (A[1] + B[1]) / 2 + (B[0] - A[0]) * bend * 0.5];
+        });
+        ctx.lineWidth = 0.9 * dpr;
+        edges.forEach((e, k) => {
+          const A = P[e.i], B = P[e.j], gl = Math.max(nodes[e.i].glow, nodes[e.j].glow);
+          ctx.strokeStyle = `rgba(77,184,255,${(0.12 + 0.2 * (A[2] + B[2]) / 2 + 0.4 * gl).toFixed(3)})`;
+          ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.quadraticCurveTo(ctl[k][0], ctl[k][1], B[0], B[1]); ctx.stroke();
+        });
+        pulses = pulses.filter(pu => {
+          pu.t += dt / pu.life;
+          const e = edges[pu.k], A = P[pu.rev ? e.j : e.i], B = P[pu.rev ? e.i : e.j], Q = ctl[pu.k];
+          if (pu.t >= 1) {
+            const end = pu.rev ? e.i : e.j; nodes[end].glow = Math.min(1, nodes[end].glow + 0.85);
+            if (rnd() < st.chain) spawn(end);
+            return false;
+          }
+          for (let s2 = 0; s2 < 9; s2++) {
+            const kk = ease(Math.max(0, pu.t - s2 * 0.02)), u = 1 - kk;
+            const x = u * u * A[0] + 2 * u * kk * Q[0] + kk * kk * B[0], y = u * u * A[1] + 2 * u * kk * Q[1] + kk * kk * B[1];
+            ctx.fillStyle = st.col; ctx.globalAlpha = 0.9 * (1 - s2 / 9);
+            ctx.beginPath(); ctx.arc(x, y, (2.4 - s2 * 0.15) * dpr, 0, 7); ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+          return true;
+        });
+        nodes.forEach((nd, i) => {
+          nd.glow *= Math.exp(-dt * 2.6);
+          const p = P[i], rad = (1.4 + 1.6 * p[2]) * dpr;
+          if (nd.glow > 0.08) {
+            const hg = ctx.createRadialGradient(p[0], p[1], 0, p[0], p[1], rad * 6);
+            hg.addColorStop(0, st.col); hg.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.globalAlpha = Math.min(1, nd.glow); ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(p[0], p[1], rad * 6, 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+          }
+          ctx.fillStyle = `rgba(160,215,255,${(0.45 + 0.5 * p[2]).toFixed(2)})`; ctx.beginPath(); ctx.arc(p[0], p[1], rad, 0, 7); ctx.fill();
+        });
+        // waveform
+        const WW = Math.round(wv.clientWidth * dpr), WH = Math.round(wv.clientHeight * dpr);
+        if (wv.width !== WW) { wv.width = WW; wv.height = WH; }
+        wx.clearRect(0, 0, WW, WH);
+        if (!(hv && hv.muted)) {
+          const amp = st.txt === 'FALANDO' ? 0.75 : st.txt === 'OUVINDO' ? 0.25 : 0.12;
+          wx.strokeStyle = st.col; wx.globalAlpha = 0.85; wx.lineWidth = 1.3 * dpr; wx.beginPath();
+          for (let i = 0; i <= 90; i++) {
+            const fx = i / 90, env = Math.sin(Math.PI * fx) ** 1.4;
+            const v = env * (0.55 * Math.sin(fx * 58 + t * 6) + 0.3 * Math.sin(fx * 170 - t * 9) + 0.15 * Math.sin(fx * 290 + t * 13));
+            const x = fx * WW, y = WH / 2 + v * (2 + 9 * amp) * dpr;
+            i ? wx.lineTo(x, y) : wx.moveTo(x, y);
+          }
+          wx.stroke(); wx.globalAlpha = 1;
+        }
+        if (!$('hudv').hidden) requestAnimationFrame(frame); else setTimeout(() => requestAnimationFrame(frame), 500);
+      }
+      requestAnimationFrame(frame);
+    })();
+
+    // ── HUD cards mirrored from the PC ───────────────────────────────────────
+    // Every card the assistant shows on the PC's HUD arrives here as
+    // {type:'hud', op:'show'|'update'|'remove'|'clear', w:{id, type, title, …}}.
+    const _hud = new Map();          // id → {spec, el, hist, born}
+    const _hudEl = document.getElementById('hud');
+    const _HC = {blue:'#4db8ff', cyan:'#33e0ff', green:'#3dffb0', yellow:'#ffd24a', orange:'#ff8a2a',
+                 red:'#ff3355', purple:'#b28cff', pink:'#ff6fb5'};
+    const _esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const _num = v => { const n = parseFloat(String(v ?? '').replace(',', '.')); return isFinite(n) ? n : null; };
+    const _fmt = (v, d) => { const n = _num(v); if (n === null) return _esc(v ?? '—');
+      const dec = d ?? (Math.abs(n) >= 100 ? 0 : (Number.isInteger(n) ? 0 : 1)); return n.toLocaleString('pt-BR', {maximumFractionDigits: dec, minimumFractionDigits: 0}); };
+    const _URL = /https?:\/\/[^\s<>"')\]]+/;
+    const _domain = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (_) { return u.slice(0, 40); } };
+
+    function openLink(url) {
+      if (!/^https?:\/\//i.test(url || '')) return;
+      if (window.MarkNative && typeof MarkNative.openUrl === 'function') MarkNative.openUrl(url);
+      else window.open(url, '_blank', 'noopener');
+    }
+
+    function _rows(items) {
+      return (items || []).slice(0, 40).map(it => {
+        let k = Array.isArray(it) ? String(it[0]) : String(it), v = Array.isArray(it) ? String(it[1] ?? '') : '';
+        if (!Array.isArray(it)) { const i = k.indexOf(': '); if (i > 0) { v = k.slice(i + 2); k = k.slice(0, i); } }
+        const mu = (k + ' ' + v).match(_URL), url = mu ? mu[0].replace(/[.,;]+$/, '') : '';
+        if (url) { k = k.replace(url, '').trim(); v = v.replace(url, '').trim(); if (!k && !v) k = _domain(url); else if (!v) v = _domain(url); }
+        return {k, v, url};
+      });
+    }
+
+    function _gauge(val, lo, hi, col) {
+      const n = _num(val) ?? 0, a = Math.max(0, Math.min(1, (n - lo) / ((hi - lo) || 1)));
+      const ang = Math.PI * (1 - a), x = 60 + 46 * Math.cos(ang), y = 62 - 46 * Math.sin(ang);
+      return `<svg viewBox="0 0 120 72" aria-hidden="true"><path d="M14 62 A46 46 0 0 1 106 62" fill="none" stroke="#16397a" stroke-width="8" stroke-linecap="round"/>
+        <path d="M14 62 A46 46 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="8" stroke-linecap="round"/></svg>`;
+    }
+    function _spark(hist, col) {
+      if (!hist || hist.length < 2) return '';
+      const lo = Math.min(...hist), hi = Math.max(...hist), r = (hi - lo) || 1;
+      const pts = hist.map((v, i) => `${(i / (hist.length - 1) * 240).toFixed(1)},${(56 - (v - lo) / r * 50).toFixed(1)}`).join(' ');
+      return `<svg viewBox="0 0 240 60" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2"/></svg>`;
+    }
+
+    function _render(c) {
+      const s = c.spec, t = String(s.type || 'number').toLowerCase(), col = _HC[s.color] || (/^#/.test(s.color || '') ? s.color : '#4db8ff');
+      const unit = s.unit ? `<small>${_esc(s.unit)}</small>` : '';
+      let body = '';
+      if (t === 'photo' && s.image) {
+        body = `<img class="hc-photo" alt="${_esc(s.title || 'imagem')}" src="${_esc(s.image)}${s.image.startsWith('/') ? '?token=' + encodeURIComponent(_authToken || '') : ''}">`;
+        if (s.text || s.subtitle) body += `<div class="hc-sub">${_esc(s.text || s.subtitle)}</div>`;
+      } else if (t === 'holo' || s.image || s.svg) {
+        if (s.image) body = `<img class="hc-holo" alt="${_esc(s.title || 'holograma')}" src="${_esc(s.image)}${s.image.startsWith('/') ? '?token=' + encodeURIComponent(_authToken || '') : ''}">`;
+        else if (s.svg) body = `<img class="hc-holo" alt="${_esc(s.title || 'holograma')}" src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(s.svg)}">`;
+        else body = `<div class="hc-sub">${_esc(s.subtitle || 'materializando no PC…')}</div>`;
+        if (s.value !== undefined && s.value !== null && !s.hide_value) body += `<div class="hc-big">${_fmt(s.value, s.decimals)}${unit}</div>`;
+      } else if (t === 'gauge') {
+        body = _gauge(s.value, _num(s.min) ?? 0, _num(s.max) ?? 100, col) + `<div class="hc-big" style="text-align:center;margin-top:-6px">${_fmt(s.value, s.decimals)}${unit}</div>`;
+      } else if (t === 'number') {
+        body = `<div class="hc-big">${_fmt(s.value, s.decimals)}${unit}</div>` + (s.trend ? `<div class="hc-sub">${_num(s.trend) >= 0 ? '▲' : '▼'} ${_fmt(Math.abs(_num(s.trend)))}%</div>` : '');
+      } else if (t === 'bar' || t === 'columns' || t === 'donut') {
+        const vals = (s.values || []).map(_num), labels = s.labels || [], mx = Math.max(...vals.filter(v => v !== null), 1);
+        body = vals.map((v, i) => `<div class="hc-bar">${_esc(labels[i] ?? '')} <b style="float:right">${_fmt(v)}${s.unit ? ' ' + _esc(s.unit) : ''}</b><i style="width:${Math.max(3, (v ?? 0) / mx * 100)}%"></i></div>`).join('');
+      } else if (t === 'line') {
+        body = _spark((s.values && s.values.length ? s.values.map(_num) : c.hist), col) + `<div class="hc-big">${_fmt(s.value ?? (c.hist[c.hist.length - 1]), s.decimals)}${unit}</div>`;
+      } else if (t === 'list' || t === 'table') {
+        body = _rows(s.items).map((r, i) => `<div class="hc-row${r.url ? ' link' : ''}" ${r.url ? `data-url="${_esc(r.url)}" role="link" tabindex="0"` : ''}><span>${_esc(r.k)}</span><b>${_esc(r.v)}${r.url ? ' ↗' : ''}</b></div>`).join('');
+      } else if (t === 'speedtest') {
+        body = `<div class="hc-row"><span>Download</span><b>${_fmt(s.down)} Mbps</b></div><div class="hc-row"><span>Upload</span><b>${_fmt(s.up)} Mbps</b></div><div class="hc-row"><span>Ping</span><b>${_fmt(s.ping)} ms</b></div>` + (s.phase ? `<div class="hc-sub">${_esc(s.phase)}</div>` : '');
+      } else {
+        body = `<div class="hc-text">${_esc(s.text || s.value || '')}</div>`;
+      }
+      if (s.subtitle && t !== 'holo' && t !== 'photo' && !s.image && !s.svg) body += `<div class="hc-sub">${_esc(s.subtitle)}</div>`;
+      const url = /^https?:\/\//i.test(s.url || '') ? s.url : '';
+      if (url) body += `<button class="hc-open" data-url="${_esc(url)}">↗ ABRIR · ${_esc(_domain(url))}</button>`;
+      c.el.style.setProperty('--hc', col);
+      c.el.innerHTML = `<div class="hc-t">${_esc(s.title || '')}</div><button class="hc-x" aria-label="Fechar cartão">×</button>${body}`;
+    }
+
+    function hudApply(m) {
+      const w = m.w || {}, id = String(w.id || '');
+      if (m.op === 'clear') { _hud.forEach(c => c.el.remove()); _hud.clear(); }
+      else if (m.op === 'remove') { const c = _hud.get(id); if (c) { c.el.remove(); _hud.delete(id); } }
+      else if (id) {
+        let c = _hud.get(id);
+        if (!c) {
+          const el = document.createElement('article'); el.className = 'hc'; el.dataset.id = id;
+          c = {spec: {}, el, hist: [], born: Date.now()}; _hud.set(id, c); _hudEl.prepend(el);
+        }
+        Object.assign(c.spec, w);
+        if (w.ttl) c.born = Date.now();
+        const v = _num(w.value); if (v !== null) { c.hist.push(v); if (c.hist.length > 60) c.hist.shift(); }
+        _render(c);
+      }
+      _hudEl.hidden = _hud.size === 0;
+    }
+
+    _hudEl.addEventListener('click', e => {
+      const x = e.target.closest('.hc-x');
+      if (x) { const el = x.closest('.hc'); _hud.delete(el.dataset.id); el.remove(); _hudEl.hidden = _hud.size === 0; return; }
+      const l = e.target.closest('[data-url]');
+      if (l) openLink(l.dataset.url);
+    });
+    _hudEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { const l = e.target.closest('[data-url]'); if (l) openLink(l.dataset.url); }
+    });
+    setInterval(() => {               // cards with a lifetime leave by themselves
+      const now = Date.now();
+      _hud.forEach((c, id) => { const ttl = _num(c.spec.ttl); if (ttl && now - c.born > ttl * 1000) { c.el.remove(); _hud.delete(id); } });
+      _hudEl.hidden = _hud.size === 0;
+    }, 2000);
+
+    // ── Phone speaker ────────────────────────────────────────────────────────
+    // The assistant's reply plays here when this phone was used to talk to it
+    // (the PC decides; see DashboardServer.phone_wants_audio). PCM arrives as
+    // 24 kHz 16-bit mono and is scheduled back to back, so chunks join up
+    // without gaps; a "flush" message (interrupt) stops it at once.
+    let _spkCtx = null, _spkWs = null, _spkNext = 0, _spkSrcs = [], _spkPing = null;
+    let _spkOn = true;
+    try { _spkOn = localStorage.getItem('mark_spk') !== '0'; } catch (_) {}
+    // Inside the Android app the voice is native (Bluetooth, Android Auto,
+    // screen off): this page only drives it through window.MarkNative.
+    const _native = (typeof window.MarkNative !== 'undefined') ? window.MarkNative : null;
+    if (_native) { try { _spkOn = _native.speakerOn(); } catch (_) {} }
+    const spkBtn = document.getElementById('spk-btn');
+
+    function _spkUnlock() {
+      // Mobile browsers only start audio after a tap: create/resume on any touch.
+      if (!_spkCtx) {
+        try { _spkCtx = new AudioContext({ sampleRate: 24000 }); }
+        catch (_) { _spkCtx = new AudioContext(); }
+      }
+      if (_spkCtx.state === 'suspended') _spkCtx.resume();
+    }
+    document.addEventListener('pointerdown', _spkUnlock);
+
+    function _spkPlay(buf) {
+      if (!_spkCtx) return;               // not unlocked yet: nothing can play
+      const pcm = new Int16Array(buf);
+      if (!pcm.length) return;
+      const ab = _spkCtx.createBuffer(1, pcm.length, 24000);
+      const ch = ab.getChannelData(0);
+      for (let i = 0; i < pcm.length; i++) ch[i] = pcm[i] / 32768;
+      const src = _spkCtx.createBufferSource();
+      src.buffer = ab;
+      src.connect(_spkCtx.destination);
+      const at = Math.max(_spkCtx.currentTime + 0.08, _spkNext);
+      src.start(at);
+      _spkNext = at + ab.duration;
+      _spkSrcs.push(src);
+      src.onended = () => { _spkSrcs = _spkSrcs.filter(x => x !== src); };
+    }
+
+    function _spkFlush() {
+      _spkSrcs.forEach(s => { try { s.stop(); } catch (_) {} });
+      _spkSrcs = []; _spkNext = 0;
+    }
+
+    function _spkConnect() {
+      if (_native) return;                // the app plays the voice itself
+      if (!_spkOn || _spkWs) return;
+      const w = new WebSocket(`${_wsProto}://${location.host}/ws/phone-speaker?token=${encodeURIComponent(_authToken)}`);
+      w.binaryType = 'arraybuffer';
+      w.onmessage = e => {
+        if (typeof e.data === 'string') {
+          try { if (JSON.parse(e.data).type === 'flush') _spkFlush(); } catch (_) {}
+        } else {
+          _spkPlay(e.data);
+        }
+      };
+      w.onopen = () => { _spkPing = setInterval(() => { if (w.readyState === 1) w.send('p'); }, 25000); };
+      w.onclose = () => {
+        clearInterval(_spkPing); _spkWs = null;
+        if (_spkOn) setTimeout(_spkConnect, 3000);       // reconnect while enabled
+      };
+      _spkWs = w;
+    }
+
+    function toggleSpeaker() {
+      _spkOn = !_spkOn;
+      try { localStorage.setItem('mark_spk', _spkOn ? '1' : '0'); } catch (_) {}
+      spkBtn.classList.toggle('off', !_spkOn);
+      if (_native) { _native.speaker(_spkOn); toast(_spkOn ? '🔊 Voz no celular' : '🔇 Voz no PC'); return; }
+      if (_spkOn) { _spkUnlock(); _spkConnect(); toast('🔊 Voz no celular'); }
+      else { _spkFlush(); if (_spkWs) _spkWs.close(); toast('🔇 Voz no PC'); }
+    }
+    spkBtn.classList.toggle('off', !_spkOn);
+    _spkConnect();
+    // Offer the native app on Android browsers — not inside the app itself.
+    if (/Android/i.test(navigator.userAgent) && !/; wv\)/.test(navigator.userAgent)) {
+      document.getElementById('apk-link').style.display = 'inline-block';
+    }
+
+    // Installable app: the service worker is what lets Chrome offer "Install".
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+
+    function setStatus(s) {
+      if (s === 'active') {
+        pill.className = 'pill on'; stTxt.textContent = 'Active'; wake.classList.remove('show');
+      } else {
+        pill.className = 'pill'; stTxt.textContent = 'Sleeping'; wake.classList.add('show');
+      }
+    }
+
+    function append(speaker, text) {
+      const d = document.createElement('div');
+      if (speaker === 'jarvis') {
+        d.className = 'msg msg-j';
+        d.innerHTML = `<div class="lbl">Jarvis</div>${esc(text)}`;
+      } else {
+        d.className = 'msg msg-u';
+        d.innerHTML = `<div class="lbl">You</div>${esc(text)}`;
+      }
+      feed.appendChild(d);
+      feed.scrollTop = feed.scrollHeight;
+    }
+
+    function sys(text) {
+      const d = document.createElement('div');
+      d.className = 'msg msg-sys'; d.textContent = text;
+      feed.appendChild(d); feed.scrollTop = feed.scrollHeight;
+    }
+
+    function esc(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ── File helpers ──────────────────────────────────────────────────────────
+    function _fileIcon(name) {
+      const ext = (name.split('.').pop() || '').toLowerCase();
+      if (['jpg','jpeg','png','gif','webp','heic','heif','avif','bmp','svg'].includes(ext)) return '🖼️';
+      if (['mp4','mov','avi','mkv','webm','m4v','3gp'].includes(ext))                       return '🎬';
+      if (['mp3','m4a','wav','flac','aac','ogg','opus'].includes(ext))                      return '🎵';
+      if (['pdf'].includes(ext))                                                             return '📋';
+      if (['doc','docx','txt','md','rtf','odt'].includes(ext))                              return '📝';
+      if (['xls','xlsx','csv','ods'].includes(ext))                                         return '📊';
+      if (['ppt','pptx','odp'].includes(ext))                                               return '📑';
+      if (['zip','rar','7z','tar','gz','bz2','xz'].includes(ext))                          return '📦';
+      if (['apk','exe','dmg','deb','rpm','msi'].includes(ext))                              return '⚙️';
+      return '📎';
+    }
+
+    function _fmtSize(bytes) {
+      if (bytes < 1024)             return bytes + ' B';
+      if (bytes < 1024 * 1024)     return (bytes / 1024).toFixed(1) + ' KB';
+      if (bytes < 1024 ** 3)       return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+      return (bytes / 1024 ** 3).toFixed(2) + ' GB';
+    }
+
+    // ── File upload (phone → computer) ────────────────────────────────────────
+    function _uploadFile(file) {
+      const id = 'fc_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+
+      // Create file card in feed
+      const card = document.createElement('div');
+      card.className = 'msg-file';
+      card.id = id;
+      card.innerHTML = `
+        <div class="fc-icon">${_fileIcon(file.name)}</div>
+        <div class="fc-meta">
+          <div class="fc-lbl">Sending</div>
+          <div class="fc-name">${esc(file.name)}</div>
+          <div class="fc-size">${_fmtSize(file.size)}</div>
+          <div class="fc-bar-wrap"><div class="fc-bar" id="${id}_bar"></div></div>
+        </div>
+        <div class="fc-status" id="${id}_st">0%</div>
+      `;
+      feed.appendChild(card);
+      feed.scrollTop = feed.scrollHeight;
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/upload');
+      xhr.setRequestHeader('Authorization', `Bearer ${_authToken}`);
+
+      xhr.upload.onprogress = (e) => {
+        if (!e.lengthComputable) return;
+        const pct = Math.round(e.loaded / e.total * 100);
+        const bar = document.getElementById(`${id}_bar`);
+        const st  = document.getElementById(`${id}_st`);
+        if (bar) bar.style.width = pct + '%';
+        if (st)  st.textContent  = pct + '%';
+      };
+
+      xhr.onload = () => {
+        const bar  = document.getElementById(`${id}_bar`);
+        const st   = document.getElementById(`${id}_st`);
+        const meta = card.querySelector('.fc-meta');
+        const lbl  = card.querySelector('.fc-lbl');
+        if (xhr.status === 200) {
+          let savedName = file.name;
+          try { savedName = JSON.parse(xhr.responseText).name || file.name; } catch {}
+          const dlUrl = `/uploads/${encodeURIComponent(savedName)}?token=${encodeURIComponent(_authToken)}`;
+          if (bar)  { bar.style.width = '100%'; bar.style.background = 'var(--green)'; }
+          if (st)   { st.textContent = '✓'; st.className = 'fc-status done'; }
+          if (lbl)  lbl.textContent = 'Sent';
+          if (meta) meta.insertAdjacentHTML('beforeend',
+            `<a class="fc-dl" href="${dlUrl}" download="${esc(savedName)}">⬇ Download back</a>`);
+          toast('File sent!');
+        } else {
+          let errMsg = 'Upload failed';
+          try { errMsg = JSON.parse(xhr.responseText).error || errMsg; } catch {}
+          if (bar) bar.style.background = '#f87171';
+          if (st)  { st.textContent = 'ERR'; st.className = 'fc-status err'; }
+          if (lbl) lbl.textContent = errMsg;
+        }
+      };
+
+      xhr.onerror = () => {
+        const st  = document.getElementById(`${id}_st`);
+        const lbl = card.querySelector('.fc-lbl');
+        if (st)  { st.textContent = 'ERR'; st.className = 'fc-status err'; }
+        if (lbl) lbl.textContent = 'Connection error';
+      };
+
+      const fd = new FormData();
+      fd.append('file', file);
+      xhr.send(fd);
+    }
+
+    // File received by another WebSocket client (e.g., second open tab)
+    function _onFileReceived(m) {
+      const dlUrl = `/uploads/${encodeURIComponent(m.name)}?token=${encodeURIComponent(_authToken)}`;
+      const card  = document.createElement('div');
+      card.className = 'msg-file';
+      card.innerHTML = `
+        <div class="fc-icon">${_fileIcon(m.name)}</div>
+        <div class="fc-meta">
+          <div class="fc-lbl">Received</div>
+          <div class="fc-name">${esc(m.name)}</div>
+          <div class="fc-size">${_fmtSize(m.size)}</div>
+          <a class="fc-dl" href="${dlUrl}" download="${esc(m.name)}">⬇ Download</a>
+        </div>
+        <div class="fc-status done">✓</div>
+      `;
+      feed.appendChild(card);
+      feed.scrollTop = feed.scrollHeight;
+      toast('File received on computer!');
+    }
+
+    // File input change handler
+    document.getElementById('file-inp').addEventListener('change', function () {
+      Array.from(this.files).forEach(_uploadFile);
+      this.value = ''; // reset so the same file can be re-sent
+    });
+
+    // ── Commands ──────────────────────────────────────────────────────────────
+    function doSend() {
+      const inp = document.getElementById('inp');
+      const txt = inp.value.trim();
+      if (!txt) return;
+      inp.value = '';
+      append('user', txt);
+      const enc  = _encrypt(txt);
+      const body = enc ? { enc } : { text: txt };
+      _authFetch('/api/command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+    }
+
+    function doWake() {
+      sys('Sending wake signal…');
+      _authFetch('/api/wake', { method: 'POST' });
+    }
+
+    document.getElementById('inp').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); }
+    });
+
+    // ── Toast ─────────────────────────────────────────────────────────────────
+    let _toastTimer;
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      clearTimeout(_toastTimer);
+      _toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    // ── Real-time Voice — PCM16 WebSocket → Gemini Live ──────────────────────
+    const micBtn  = document.getElementById('mic-btn');
+    let _voiceWs  = null;
+    let _audioCtx = null;
+    let _micStm   = null;
+    let _audioNd  = null;
+
+    function _micIdle() {
+      micBtn.innerHTML = '🎤';
+      micBtn.title     = 'Voice — tap to speak';
+      micBtn.classList.remove('recording');
+    }
+
+    // Float32 PCM → resample to 16 kHz + convert to Int16
+    function _f32toPcm16(f32, srcRate) {
+      let s = f32;
+      if (srcRate !== 16000) {
+        const ratio = srcRate / 16000;
+        const len   = Math.round(f32.length / ratio);
+        s = new Float32Array(len);
+        for (let i = 0; i < len; i++)
+          s[i] = f32[Math.min(Math.round(i * ratio), f32.length - 1)];
+      }
+      const out = new Int16Array(s.length);
+      for (let i = 0; i < s.length; i++)
+        out[i] = Math.max(-32768, Math.min(32767, Math.round(s[i] * 32768)));
+      return out.buffer;
+    }
+
+    function _showVoiceSetup() {
+      if (document.getElementById('voice-setup')) return; // show once
+      const origin = location.origin;
+      const card = document.createElement('div');
+      card.id = 'voice-setup';
+      card.style.cssText = [
+        'align-self:stretch', 'background:rgba(99,102,241,0.07)',
+        'border:1px solid rgba(99,102,241,0.22)', 'border-radius:14px',
+        'padding:16px 18px', 'font-size:13px', 'line-height:1.8',
+        'animation:pop 0.18s ease'
+      ].join(';');
+      card.innerHTML =
+        '<div style="font-weight:700;color:#818cf8;letter-spacing:.5px;margin-bottom:10px">🎤 One-time voice setup</div>' +
+        '<ol style="padding-left:18px;color:#8899aa;margin:0;display:flex;flex-direction:column;gap:4px">' +
+        '<li>Open a new tab → go to <span style="background:rgba(255,255,255,0.07);padding:1px 6px;border-radius:4px;font-family:monospace;font-size:12px">chrome://flags</span></li>' +
+        '<li>Search: <strong style="color:#dde3ed">Insecure origins treated as secure</strong></li>' +
+        '<li>Paste this URL into the box:<br><span id="flags-url" style="background:rgba(255,255,255,0.07);padding:2px 8px;border-radius:4px;font-family:monospace;font-size:11px;user-select:all;cursor:pointer">' + esc(origin) + '</span></li>' +
+        '<li>Set to <strong style="color:#22c55e">Enabled</strong> → tap <strong style="color:#dde3ed">Relaunch</strong></li>' +
+        '<li>Return here and tap 🎤</li>' +
+        '</ol>';
+      feed.appendChild(card);
+      feed.scrollTop = feed.scrollHeight;
+      // tap to copy
+      card.querySelector('#flags-url').addEventListener('click', () => {
+        navigator.clipboard?.writeText(origin).then(() => toast('URL copied!')).catch(() => {});
+      });
+    }
+
+    // Native mic (Android app): the button mirrors the app's state, which the
+    // car screen, the notification or a headset button can also change.
+    let _nativeMicOn = false;
+    function _nativeMicSync() {
+      let on = false;
+      try { on = _native.listening(); } catch (_) {}
+      if (on === _nativeMicOn) return;
+      _nativeMicOn = on;
+      if (on) { micBtn.innerHTML = '⏹'; micBtn.title = 'Tap to stop'; micBtn.classList.add('recording'); }
+      else _micIdle();
+    }
+    if (_native) setInterval(_nativeMicSync, 700);
+
+    async function doMic() {
+      if (_native) {
+        _native.mic(!_nativeMicOn);
+        setTimeout(_nativeMicSync, 250);
+        return;
+      }
+      if (_voiceWs) { _stopVoice(); return; }
+
+      if (!navigator.mediaDevices?.getUserMedia) {
+        _showVoiceSetup();
+        return;
+      }
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true },
+        });
+      } catch (e) {
+        sys(e.name === 'NotAllowedError'
+          ? 'Microphone denied — tap the address bar lock and allow microphone.'
+          : 'Mic error: ' + e.message);
+        return;
+      }
+
+      // 16 kHz context (fall back to native rate — _f32toPcm16 resamples)
+      let ctx;
+      try { ctx = new AudioContext({ sampleRate: 16000 }); }
+      catch (_) { ctx = new AudioContext(); }
+      if (ctx.state === 'suspended') await ctx.resume();
+
+      const wsProto = location.protocol === 'https:' ? 'wss' : 'ws';
+      const ws = new WebSocket(
+        `${wsProto}://${location.host}/ws/phone-audio?token=${encodeURIComponent(_authToken)}`
+      );
+      ws.binaryType = 'arraybuffer';
+
+      ws.onopen = async () => {
+        const rate = ctx.sampleRate;
+        const src  = ctx.createMediaStreamSource(stream);
+
+        // AudioWorklet (modern) — runs in dedicated audio thread
+        const wCode = `class J extends AudioWorkletProcessor{process(i){const c=i[0]?.[0];if(c)this.port.postMessage(c.slice());return true;}}registerProcessor('j',J);`;
+        try {
+          const burl = URL.createObjectURL(new Blob([wCode], { type: 'application/javascript' }));
+          await ctx.audioWorklet.addModule(burl);
+          URL.revokeObjectURL(burl);
+          const nd = new AudioWorkletNode(ctx, 'j');
+          // Buffer to 1024 samples (64 ms at 16 kHz) before sending —
+          // matches PC mic chunk size, prevents queue flooding on the server.
+          let _pbuf = [], _plen = 0;
+          nd.port.onmessage = e => {
+            const chunk = new Int16Array(_f32toPcm16(e.data, rate));
+            _pbuf.push(chunk); _plen += chunk.length;
+            if (_plen >= 1024) {
+              const out = new Int16Array(_plen); let off = 0;
+              for (const c of _pbuf) { out.set(c, off); off += c.length; }
+              if (ws.readyState === 1) ws.send(out.buffer);
+              _pbuf = []; _plen = 0;
+            }
+          };
+          src.connect(nd);
+          _audioNd = nd;
+        } catch (_) {
+          // ScriptProcessor fallback (deprecated, still works everywhere)
+          const sp = ctx.createScriptProcessor(4096, 1, 1);
+          sp.onaudioprocess = e => {
+            if (ws.readyState === 1) ws.send(_f32toPcm16(e.inputBuffer.getChannelData(0), rate));
+          };
+          src.connect(sp); sp.connect(ctx.destination);
+          _audioNd = sp;
+        }
+
+        micBtn.innerHTML = '⏹';
+        micBtn.title     = 'Tap to stop';
+        micBtn.classList.add('recording');
+        sys('Voice live — speak now');
+        toast('🎤 Live');
+      };
+
+      ws.onclose = () => { _stopVoice(); };
+      ws.onerror = () => { sys('Voice connection failed.'); _stopVoice(); };
+
+      _voiceWs  = ws;
+      _audioCtx = ctx;
+      _micStm   = stream;
+    }
+
+    function _stopVoice() {
+      if (_audioNd)  { try { _audioNd.disconnect(); }  catch (_) {}; _audioNd  = null; }
+      if (_audioCtx) { try { _audioCtx.close(); }      catch (_) {}; _audioCtx = null; }
+      if (_micStm)   { _micStm.getTracks().forEach(t => t.stop()); _micStm = null; }
+      if (_voiceWs)  {
+        const w = _voiceWs; _voiceWs = null;
+        if (w.readyState < 2) w.close();
+      }
+      _micIdle();
+    }
+  </script>
+</body>
+</html>

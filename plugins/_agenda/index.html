@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agenda</title>
+<style>
+  :root {
+    --bg: #020a1c; --panel: #061433; --panel2: #08183d; --border: #16397a;
+    --pri: #4db8ff; --pri-dim: #2a72c9; --text: #cfe9ff; --dim: #6f93c8;
+    --shared: #ffc93c; --green: #3dffb0; --red: #ff3355;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 13px Bahnschrift, "Segoe UI", sans-serif; }
+  body { overflow: hidden; display: flex; flex-direction: column; }
+  .box { background: rgba(6, 20, 51, .92); border: 1px solid var(--border); border-radius: 6px; }
+  button { font: inherit; }
+  .btn { color: #e0efff; background: transparent; border: 1px solid #2a4f8f; border-radius: 16px;
+    padding: 5px 12px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+  .btn:hover { border-color: var(--pri); background: var(--panel2); }
+  .btn.on { background: var(--pri-dim); border-color: var(--pri); color: #fff; }
+  .btn.go { border-color: var(--green); color: var(--green); }
+  .btn.danger:hover { border-color: var(--red); color: var(--red); }
+  header { display: flex; align-items: center; gap: 8px; padding: 12px 16px; flex-wrap: wrap; }
+  header h1 { margin: 0 8px 0 0; font-size: 15px; letter-spacing: .1em; color: #fff; font-weight: 600; }
+  #mname { color: #fff; font-size: 15px; min-width: 150px; text-align: center; }
+  .sp { flex: 1; }
+  main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 12px; padding: 0 16px 16px; }
+  #grid { display: flex; flex-direction: column; min-height: 0; }
+  .wk { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .wk.head div { color: var(--dim); font-size: 12px; padding: 0 6px 4px; text-transform: lowercase; }
+  #cells { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; gap: 5px; min-height: 0; }
+  .cell { background: var(--panel); border: 1px solid transparent; border-radius: 8px; padding: 6px 7px;
+    cursor: pointer; overflow: hidden; display: flex; flex-direction: column; gap: 3px; min-height: 0; }
+  .cell:hover { border-color: var(--border); }
+  .cell.out { opacity: .35; }
+  .cell.today { border-color: var(--pri); background: #0d2c66; }
+  .cell.sel { box-shadow: 0 0 0 2px var(--green) inset; }
+  .cell .n { color: #9fbde6; font-size: 13px; }
+  .cell.today .n { color: #fff; font-weight: 600; }
+  .cell .ev { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 6px;
+    border-left: 2px solid var(--pri); color: #dbe9fb; }
+  .cell .ev.compartilhada { border-left-color: var(--shared); }
+  .cell .more { font-size: 11px; color: var(--dim); }
+  #week { flex: 1; display: none; grid-template-columns: repeat(7, 1fr); gap: 6px; min-height: 0; }
+  #week .col { background: var(--panel); border-radius: 8px; padding: 8px; overflow-y: auto; cursor: pointer; }
+  #week .col.today { border: 1px solid var(--pri); background: #0d2c66; }
+  #week .col h3 { margin: 0 0 6px; font-size: 12px; color: #9fbde6; font-weight: 500; }
+  #week .wev { font-size: 12px; padding: 4px 6px; margin-bottom: 5px; border-left: 3px solid var(--pri);
+    background: rgba(77, 184, 255, .06); border-radius: 0 4px 4px 0; }
+  #week .wev.compartilhada { border-left-color: var(--shared); background: rgba(255, 201, 60, .06); }
+  #week .wev b { color: #fff; font-weight: 500; display: block; }
+  .legend { display: flex; gap: 14px; color: var(--dim); font-size: 12px; margin-top: 8px; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: 0; }
+  aside { display: flex; flex-direction: column; gap: 12px; min-height: 0; overflow-y: auto; }
+  aside .box { padding: 12px; }
+  aside h2 { margin: 0 0 8px; font-size: 14px; color: #fff; font-weight: 500; display: flex; justify-content: space-between; }
+  aside h2 small { color: var(--pri); font-weight: 400; }
+  .item { padding: 8px 0; border-top: 1px solid #15325f; }
+  .item:first-of-type { border-top: 0; }
+  .item .row { display: grid; grid-template-columns: 46px 3px 1fr; gap: 8px; align-items: center; }
+  .item .t { color: var(--pri); }
+  .item .bar { height: 30px; border-radius: 2px; background: var(--pri); }
+  .item .bar.compartilhada { background: var(--shared); }
+  .item .ti { color: #fff; }
+  .item .sub { color: var(--dim); font-size: 12px; }
+  .item .acts { display: flex; gap: 6px; margin: 8px 0 0 57px; flex-wrap: wrap; }
+  .item .acts .btn { padding: 3px 9px; font-size: 12px; }
+  .empty { color: var(--dim); padding: 4px 0; }
+  .next div { padding: 3px 0; color: #cfe0f5; }
+  .next span { color: var(--dim); }
+  #modal { position: fixed; inset: 0; background: rgba(2, 10, 28, .8); display: none; align-items: center;
+    justify-content: center; z-index: 10; }
+  #modal.on { display: flex; }
+  #form { width: min(420px, 92%); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  #form h3 { margin: 0; color: #fff; font-weight: 500; }
+  #form label { display: flex; flex-direction: column; gap: 4px; color: var(--dim); font-size: 12px; }
+  #form input, #form select { background: var(--panel); color: #fff; border: 1px solid var(--border); border-radius: 6px;
+    padding: 7px 9px; font: inherit; }
+  #form .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  #form .acts { display: flex; justify-content: flex-end; gap: 8px; }
+  #err { color: var(--red); font-size: 12px; min-height: 14px; }
+  #toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); padding: 9px 16px; display: none;
+    max-width: 70%; z-index: 20; }
+  .warn { color: var(--shared); font-size: 12px; padding: 0 16px 6px; display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>AGENDA</h1>
+  <button class="btn" id="prev" aria-label="Mês anterior">◀</button>
+  <span id="mname"></span>
+  <button class="btn" id="next" aria-label="Próximo mês">▶</button>
+  <button class="btn" id="today">Hoje</button>
+  <span class="sp"></span>
+  <button class="btn on" id="vmonth">Mês</button>
+  <button class="btn" id="vweek">Semana</button>
+  <button class="btn go" id="new">＋ Novo evento</button>
+  <button class="btn" id="back">✕ Voltar</button>
+</header>
+<div class="warn" id="warn"></div>
+<main>
+  <section id="grid">
+    <div class="wk head"><div>dom</div><div>seg</div><div>ter</div><div>qua</div><div>qui</div><div>sex</div><div>sáb</div></div>
+    <div id="cells"></div>
+    <div id="week"></div>
+    <div class="legend"><span><i class="dot" style="background:var(--pri)"></i>Pessoal</span>
+      <span><i class="dot" style="background:var(--shared)"></i>Compartilhada</span></div>
+  </section>
+  <aside>
+    <div class="box" id="day"></div>
+    <div class="box next" id="upcoming"></div>
+  </aside>
+</main>
+<div id="modal"><div id="form" class="box"></div></div>
+<div id="toast" class="box"></div>
+
+<script>
+"use strict";
+const Q = new URLSearchParams(location.search);
+const TOKEN = Q.get("t") || "";
+const api = (name, q = {}) => fetch(`/api/${name}?` + new URLSearchParams({ ...q, t: TOKEN }))
+  .then(r => r.json()).catch(e => ({ ok: false, error: String(e) }));
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro",
+  "Outubro", "Novembro", "Dezembro"];
+const WD = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const TODAY = iso(new Date());
+let Y = new Date().getFullYear(), M = new Date().getMonth() + 1, SEL = TODAY, VIEW = "month";
+let EV = [], CALS = null;
+
+function toast(t, ms = 4500) { const el = $("toast"); el.textContent = t; el.style.display = "block";
+  clearTimeout(el._t); el._t = setTimeout(() => el.style.display = "none", ms); }
+const byDay = d => EV.filter(e => e.date === d).sort((a, b) => (a.time || "00").localeCompare(b.time || "00"));
+const tm = e => !e.time || e.time === "dia todo" ? "dia" : e.time;
+
+async function load() {
+  $("mname").textContent = `${MONTHS[M - 1]} ${Y}`;
+  const r = await api("month", { y: Y, m: M });
+  EV = r.ok ? r.events : [];
+  // shown from the cache while it is read again: take the fresh one in a moment
+  clearTimeout(load._t);
+  if (r.stale) load._t = setTimeout(load, 9000);
+  const w = $("warn");
+  w.style.display = r.errors && r.errors.length ? "block" : "none";
+  w.textContent = r.errors && r.errors.length ? "Alguma agenda não respondeu: " + r.errors.join(" · ") : "";
+  render();
+}
+
+function render() {
+  $("cells").style.display = VIEW === "month" ? "grid" : "none";
+  $("week").style.display = VIEW === "week" ? "grid" : "none";
+  document.querySelector(".wk.head").style.display = VIEW === "month" ? "grid" : "none";
+  $("vmonth").classList.toggle("on", VIEW === "month"); $("vweek").classList.toggle("on", VIEW === "week");
+  VIEW === "month" ? renderMonth() : renderWeek();
+  renderDay(); renderUpcoming();
+}
+
+function renderMonth() {
+  const first = new Date(Y, M - 1, 1), start = new Date(first); start.setDate(1 - first.getDay());
+  const rows = Math.ceil((first.getDay() + new Date(Y, M, 0).getDate()) / 7);
+  let h = "";
+  for (let i = 0; i < rows * 7; i++) {
+    const d = new Date(start); d.setDate(start.getDate() + i);
+    const ds = iso(d), evs = byDay(ds), out = d.getMonth() !== M - 1;
+    const shown = evs.slice(0, 3).map(e => `<div class="ev ${e.kind}">${tm(e)} ${esc(e.title)}</div>`).join("");
+    h += `<div class="cell${out ? " out" : ""}${ds === TODAY ? " today" : ""}${ds === SEL ? " sel" : ""}" data-d="${ds}">
+      <span class="n">${d.getDate()}</span>${shown}${evs.length > 3 ? `<span class="more">+${evs.length - 3}</span>` : ""}</div>`;
+  }
+  $("cells").innerHTML = h;
+}
+
+function renderWeek() {
+  const s = parse(SEL); s.setDate(s.getDate() - s.getDay());
+  let h = "";
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(s); d.setDate(s.getDate() + i);
+    const ds = iso(d), evs = byDay(ds);
+    h += `<div class="col${ds === TODAY ? " today" : ""}" data-d="${ds}"><h3>${WD[i]} ${d.getDate()}</h3>` +
+      (evs.length ? evs.map(e => `<div class="wev ${e.kind}"><b>${tm(e)}</b>${esc(e.title)}</div>`).join("")
+        : '<div class="empty">livre</div>') + "</div>";
+  }
+  $("week").innerHTML = h;
+  const e = new Date(s); e.setDate(s.getDate() + 6);
+  $("mname").textContent = `${s.getDate()}/${s.getMonth() + 1} – ${e.getDate()}/${e.getMonth() + 1}`;
+}
+
+function renderDay() {
+  const d = parse(SEL), evs = byDay(SEL);
+  const label = `${WD[d.getDay()]}, ${String(d.getDate()).padStart(2, "0")} ${MONTHS[d.getMonth()].slice(0, 3).toLowerCase()}`;
+  $("day").innerHTML = `<h2>${label}<small>${SEL === TODAY ? "hoje" : ""}</small></h2>` +
+    (evs.length ? evs.map((e, k) => `<div class="item" data-k="${k}">
+      <div class="row"><span class="t">${tm(e)}</span><span class="bar ${e.kind}"></span>
+        <div><div class="ti">${esc(e.title)}</div><div class="sub">${esc({ compartilhada: "Compartilhada", pessoal: "Pessoal" }[e.kind] || "Nota")}${e.calendar ? " · " + esc(e.calendar) : ""}</div></div></div>
+      ${e.where ? `<div class="sub" style="margin:4px 0 0 57px">${esc(e.where.split("\n")[0])}</div>` : ""}
+      <div class="acts"><button class="btn" data-a="edit">✎ Editar</button><button class="btn danger" data-a="del">🗑 Apagar</button>
+        <button class="btn" data-a="remind">🔔 Lembrar</button></div></div>`).join("")
+      : `<div class="empty">Nada marcado.</div><div style="margin-top:8px"><button class="btn go" id="newday">＋ Novo evento neste dia</button></div>`);
+  $("day").querySelectorAll(".item").forEach(el => {
+    const e = evs[+el.dataset.k];
+    el.querySelector('[data-a="edit"]').onclick = () => form(e);
+    el.querySelector('[data-a="del"]').onclick = () => del(e);
+    el.querySelector('[data-a="remind"]').onclick = () => remind(e);
+  });
+  const nd = $("newday"); if (nd) nd.onclick = () => form(null, SEL);
+}
+
+function renderUpcoming() {
+  const up = EV.filter(e => e.date > SEL).sort((a, b) => (a.date + (a.time || "")).localeCompare(b.date + (b.time || ""))).slice(0, 6);
+  $("upcoming").innerHTML = "<h2>Próximos</h2>" + (up.length ? up.map(e => {
+    const d = parse(e.date);
+    return `<div><span>${WD[d.getDay()]} ${String(d.getDate()).padStart(2, "0")} · ${tm(e)}</span> ${esc(e.title)}</div>`;
+  }).join("") : '<div class="empty">Nada depois deste dia neste mês.</div>');
+}
+
+async function form(e, day) {
+  if (!CALS) { const r = await api("calendars"); CALS = r.ok ? r.calendars : ["Nota local"]; }
+  const isEdit = !!e;
+  $("form").innerHTML = `<h3>${isEdit ? "Editar evento" : "Novo evento"}</h3>
+    <label>Título<input id="f_title" value="${esc(e ? e.title : "")}" placeholder="Jantar com amigos"></label>
+    <div class="two"><label>Data<input id="f_date" type="date" value="${e ? e.date : (day || SEL)}"></label>
+      <label>Hora (vazio = dia todo)<input id="f_time" type="time" value="${e && e.time && e.time !== "dia todo" ? e.time : ""}"></label></div>
+    <div class="two"><label>Duração (min)<input id="f_min" type="number" min="5" step="5" value="60"></label>
+      <label>Agenda<select id="f_cal">${CALS.map(c => `<option>${esc(c)}</option>`).join("")}</select></label></div>
+    <label>Local<input id="f_where" value="${esc(e ? (e.where || "").split("\n")[0] : "")}" placeholder="opcional"></label>
+    <div id="err"></div>
+    <div class="acts"><button class="btn" id="f_cancel">Cancelar</button><button class="btn go" id="f_save">Salvar</button></div>`;
+  if (e && e.kind === "compartilhada") { const s = $("f_cal"); [...s.options].forEach(o => { if (o.text.startsWith("iCloud")) o.selected = true; }); }
+  $("modal").classList.add("on"); $("f_title").focus();
+  $("f_cancel").onclick = () => $("modal").classList.remove("on");
+  $("f_title").oninput = () => $("err").textContent = "";
+  $("f_save").onclick = async () => {
+    const title = $("f_title").value.trim(), date = $("f_date").value;
+    if (!title) { $("err").textContent = "Escreva o título do evento."; return; }
+    if (!date) { $("err").textContent = "Escolha a data."; return; }
+    $("f_save").disabled = true; $("f_save").textContent = "Salvando…";
+    const r = await api("add", { title, date, time: $("f_time").value, minutes: $("f_min").value,
+      calendar: $("f_cal").value, where: $("f_where").value });
+    if (!r.ok) { $("err").textContent = r.result || r.error || "Não salvou."; $("f_save").disabled = false; $("f_save").textContent = "Salvar"; return; }
+    $("modal").classList.remove("on");
+    if (isEdit) {
+      // the new one is in; the old one goes (a real calendar asks to confirm on the HUD)
+      const d = await api("remove", { title: e.title, date: e.date });
+      toast("Evento atualizado. " + (d.result && /confirm|CONFIRM/i.test(d.result) ? "Confirme no HUD a remoção da versão antiga." : ""));
+    } else toast("Evento criado.");
+    SEL = date; const nd = parse(date); Y = nd.getFullYear(); M = nd.getMonth() + 1;
+    setTimeout(load, 1200);
+  };
+}
+
+async function del(e) {
+  const r = await api("remove", { title: e.title, date: e.date });
+  toast(/confirm/i.test(r.result || "") ? "Confirme a remoção no HUD (botão de confirmar)." : (r.result || "Removido."), 6000);
+  setTimeout(load, 2500);
+}
+
+function remind(e) {
+  const at = e.time && e.time !== "dia todo" ? e.time : "09:00";
+  $("form").innerHTML = `<h3>Lembrar: ${esc(e.title)}</h3>
+    <div class="two"><label>Quando<select id="r_when"><option value="15">15 min antes</option><option value="30" selected>30 min antes</option>
+      <option value="60">1 hora antes</option><option value="1440">1 dia antes</option><option value="at">Na hora</option></select></label>
+      <label>Data e hora do evento<input value="${e.date} ${at}" disabled></label></div>
+    <div id="err"></div>
+    <div class="acts"><button class="btn" id="r_cancel">Cancelar</button><button class="btn go" id="r_ok">Criar lembrete</button></div>`;
+  $("modal").classList.add("on");
+  $("r_cancel").onclick = () => $("modal").classList.remove("on");
+  $("r_ok").onclick = async () => {
+    const v = $("r_when").value, [h, m] = at.split(":").map(Number), when = parse(e.date);
+    when.setHours(h, m, 0, 0);
+    if (v !== "at") when.setMinutes(when.getMinutes() - Number(v));
+    if (when < new Date()) { $("err").textContent = "Esse horário já passou. Escolha outro."; return; }
+    const hm = `${String(when.getHours()).padStart(2, "0")}:${String(when.getMinutes()).padStart(2, "0")}`;
+    const r = await api("remind", { date: iso(when), time: hm, message: `${e.title} às ${at}` });
+    $("modal").classList.remove("on");
+    toast(r.result || "Lembrete criado.");
+  };
+}
+
+document.addEventListener("click", ev => {
+  const c = ev.target.closest("[data-d]");
+  if (c && !ev.target.closest("button")) {
+    SEL = c.dataset.d;
+    const d = parse(SEL);
+    if (d.getMonth() + 1 !== M || d.getFullYear() !== Y) { Y = d.getFullYear(); M = d.getMonth() + 1; load(); }
+    else render();
+  }
+});
+$("prev").onclick = () => { if (VIEW === "week") { const d = parse(SEL); d.setDate(d.getDate() - 7); SEL = iso(d); Y = d.getFullYear(); M = d.getMonth() + 1; }
+  else { M--; if (M < 1) { M = 12; Y--; } SEL = iso(new Date(Y, M - 1, 1)); } load(); };
+$("next").onclick = () => { if (VIEW === "week") { const d = parse(SEL); d.setDate(d.getDate() + 7); SEL = iso(d); Y = d.getFullYear(); M = d.getMonth() + 1; }
+  else { M++; if (M > 12) { M = 1; Y++; } SEL = iso(new Date(Y, M - 1, 1)); } load(); };
+$("today").onclick = () => { const d = new Date(); Y = d.getFullYear(); M = d.getMonth() + 1; SEL = TODAY; load(); };
+$("vmonth").onclick = () => { VIEW = "month"; $("mname").textContent = `${MONTHS[M - 1]} ${Y}`; render(); };
+$("vweek").onclick = () => { VIEW = "week"; render(); };
+$("new").onclick = () => form(null, SEL);
+$("back").onclick = () => api("close");
+document.addEventListener("keydown", e => { if (e.key === "Escape") $("modal").classList.remove("on"); });
+$("modal").addEventListener("click", e => { if (e.target.id === "modal") $("modal").classList.remove("on"); });
+load();
+</script>
+</body>
+</html>

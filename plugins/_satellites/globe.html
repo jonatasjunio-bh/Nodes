@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Satélites</title>
+<style>
+  /* The HUD's own palette (ui.py, class C) — same as the world-cams map. */
+  :root {
+    --bg: #020a1c; --panel: #061433; --panel2: #08183d; --border: #16397a;
+    --pri: #4db8ff; --pri-dim: #2a72c9; --acc: #ff8a2a; --text: #cfe9ff;
+    --dim: #5f86c2; --red: #ff3355; --green: #3dffb0;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 13px Bahnschrift, "Segoe UI", sans-serif; overflow: hidden; }
+  #app { display: flex; height: 100%; }
+  #view { position: relative; flex: 1; min-width: 0; }
+  #view canvas { display: block; }
+  .box { background: rgba(6, 20, 51, .92); border: 1px solid var(--border); border-radius: 4px; }
+  #bar { position: absolute; top: 8px; left: 8px; right: 8px; z-index: 10; display: flex; gap: 8px;
+    align-items: center; pointer-events: none; flex-wrap: wrap; }
+  #bar > * { pointer-events: auto; }
+  #stats { padding: 6px 10px; }
+  #stats b { color: var(--pri); }
+  #stats .up { color: var(--green); }
+  #clock { padding: 6px 10px; color: var(--dim); margin-left: auto; font-variant-numeric: tabular-nums; }
+  #load { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: var(--dim); z-index: 5; pointer-events: none; }
+  #tip { position: absolute; z-index: 20; padding: 4px 8px; pointer-events: none; display: none;
+    white-space: nowrap; font-size: 12px; }
+  #label { position: absolute; z-index: 15; pointer-events: none; display: none; padding: 3px 8px;
+    color: #fff; font-size: 12px; border-color: var(--pri); transform: translate(12px, -50%); }
+  #hint { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 10;
+    color: var(--dim); padding: 5px 12px; font-size: 12px; white-space: nowrap; }
+
+  #side { width: 320px; flex: none; background: var(--panel); border-left: 1px solid var(--border);
+    display: flex; flex-direction: column; min-height: 0; overflow-y: auto; }
+  .sec { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  .sec h2 { margin: 0 0 8px; font-size: 13px; color: var(--pri); letter-spacing: .06em;
+    text-transform: uppercase; font-weight: 600; display: flex; justify-content: space-between; }
+  .sec h2 small { color: var(--dim); font-weight: 400; letter-spacing: 0; text-transform: none; }
+  #q { width: 100%; color: var(--text); padding: 6px 8px; font: inherit; }
+  #q:focus { outline: none; border-color: var(--pri); }
+  #results { margin-top: 6px; max-height: 300px; overflow-y: auto; }
+  #results .head { color: var(--pri); padding: 4px 6px; display: flex; justify-content: space-between; }
+  #results .more { color: var(--pri); cursor: pointer; padding: 6px; text-align: center; }
+  .cat .ls { color: var(--dim); padding: 0 4px; cursor: pointer; }
+  .cat .ls:hover { color: var(--pri); }
+  .res { padding: 4px 6px; cursor: pointer; border-radius: 3px; display: flex; gap: 6px; align-items: center; }
+  .res:hover { background: var(--panel2); }
+  .res .n { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .res .id { color: var(--dim); font-size: 11px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; display: inline-block; }
+  .cat { display: flex; align-items: center; gap: 8px; padding: 3px 4px; cursor: pointer; border-radius: 3px;
+    user-select: none; }
+  .cat:hover { background: var(--panel2); }
+  .cat.off { opacity: .35; }
+  .cat .l { flex: 1; }
+  .cat .c { color: var(--text); font-variant-numeric: tabular-nums; }
+  .cat .u { color: var(--green); font-size: 11px; width: 52px; text-align: right; font-variant-numeric: tabular-nums; }
+  .feat { padding: 6px; border: 1px solid transparent; border-radius: 4px; cursor: pointer; margin-bottom: 4px; }
+  .feat:hover { background: var(--panel2); border-color: var(--border); }
+  .feat .t { color: var(--text); }
+  .feat .s { color: var(--dim); font-size: 11px; margin-top: 2px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .btn { color: var(--pri); padding: 4px 9px; border-radius: 12px; cursor: pointer; font: inherit; font-size: 12px; }
+  .btn:hover { border-color: var(--pri); background: var(--panel2); }
+  .btn.on { background: var(--pri-dim); color: #fff; }
+  #sel { display: none; }
+  #sel table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  #sel td { padding: 2px 0; } #sel td:first-child { color: var(--dim); width: 44%; }
+  #sel .name { font-size: 15px; color: #fff; margin-bottom: 4px; }
+  #passes { margin-top: 6px; font-size: 12px; }
+  #passes div { padding: 2px 0; }
+  #passes .hi { color: var(--green); }
+  .spin { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--pri-dim);
+    border-top-color: var(--pri); border-radius: 50%; animation: s .8s linear infinite;
+    margin-right: 6px; vertical-align: -1px; }
+  @keyframes s { to { transform: rotate(360deg); } }
+
+  #modal { position: absolute; inset: 0; z-index: 50; background: rgba(2, 10, 28, .8);
+    display: none; align-items: center; justify-content: center; padding: 20px; }
+  #modal.on { display: flex; }
+  #mbox { width: min(1000px, 100%); max-height: 100%; display: flex; flex-direction: column; }
+  #mhead { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  #mtitle { flex: 1; color: var(--pri); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #mclose { background: none; border: 0; color: var(--dim); font: inherit; cursor: pointer; }
+  #mclose:hover { color: var(--pri); }
+  #mbody { overflow: auto; padding: 10px; min-height: 120px; }
+  #mbody img.big { max-width: 100%; max-height: 70vh; display: block; margin: 0 auto; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .grid div { cursor: pointer; } .grid img { width: 100%; height: 100px; object-fit: cover; border-radius: 3px; }
+  .grid span { display: block; font-size: 11px; color: var(--dim); margin-top: 3px; }
+  .crew h3 { color: var(--pri); font-size: 13px; margin: 8px 0 4px; }
+  .crew div { padding: 2px 0; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="view">
+    <div id="load"><span class="spin"></span>carregando os satélites…</div>
+    <div id="bar">
+      <div id="stats" class="box"></div>
+      <div id="clock" class="box"></div>
+    </div>
+    <div id="tip" class="box"></div>
+    <div id="label" class="box"></div>
+    <div id="hint" class="box">Arraste para girar · roda do mouse para aproximar · clique num satélite</div>
+    <div id="modal"><div id="mbox" class="box">
+      <div id="mhead"><span id="mtitle"></span><button id="mclose">✕ FECHAR</button></div>
+      <div id="mbody"></div>
+    </div></div>
+  </div>
+  <div id="side">
+    <div class="sec">
+      <input id="q" class="box" placeholder="Procurar satélite (nome ou número NORAD)" autocomplete="off">
+      <div id="results"></div>
+    </div>
+    <div class="sec" id="sel">
+      <h2>Selecionado <small id="selcat"></small></h2>
+      <div class="name" id="selname"></div>
+      <table id="seltab"></table>
+      <div class="btns" id="selbtns"></div>
+      <div id="passes"></div>
+    </div>
+    <div class="sec">
+      <h2>Com interação</h2>
+      <div id="feat"></div>
+    </div>
+    <div class="sec">
+      <h2>Categorias <small>total · <span style="color:var(--green)">acima de você</span></small></h2>
+      <div id="cats"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+const Q = new URLSearchParams(location.search);
+const TOKEN = Q.get("t") || "";
+const api = (name, q = {}) =>
+  fetch(`/api/${name}?` + new URLSearchParams({ ...q, t: TOKEN })).then(r => r.json())
+    .catch(e => ({ ok: false, error: String(e) }));
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fold = s => String(s || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const fmt = n => Number(n).toLocaleString("pt-BR");
+const IMG = "https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/";
+const R = 100, RE = 6371;
+
+// ── the scene ───────────────────────────────────────────────────────────────
+const view = $("view");
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+view.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.5, 20000);
+camera.position.set(0, 120, 360);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 130; controls.maxDistance = 2600; controls.rotateSpeed = 0.5;
+const tex = new THREE.TextureLoader();
+tex.load(IMG + "night-sky.png", t => { t.mapping = THREE.EquirectangularReflectionMapping;
+  t.colorSpace = THREE.SRGBColorSpace; scene.background = t; });
+
+function resize() {
+  const w = view.clientWidth, h = view.clientHeight;
+  renderer.setSize(w, h); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix();
+}
+addEventListener("resize", resize); resize();
+
+// lat/lon (degrees) and height (km) → scene. The globe's texture puts lon -180 on -x.
+function xyz(lat, lon, alt, out = new THREE.Vector3()) {
+  const r = R * (1 + alt / RE), phi = (90 - lat) * Math.PI / 180, th = (lon + 180) * Math.PI / 180;
+  return out.set(-r * Math.sin(phi) * Math.cos(th), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(th));
+}
+
+// The Sun's direction now (subsolar point), so day and night fall where they really are.
+function sunDir(date) {
+  const d = (date - Date.UTC(2000, 0, 1, 12)) / 864e5;
+  const g = (357.529 + 0.98560028 * d) * Math.PI / 180;
+  const q = 280.459 + 0.98564736 * d;
+  const L = (q + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) * Math.PI / 180;
+  const e = (23.439 - 0.00000036 * d) * Math.PI / 180;
+  const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L));
+  const dec = Math.asin(Math.sin(e) * Math.sin(L));
+  const gmst = satellite.gstime(date);
+  const lon = ((ra - gmst) * 180 / Math.PI + 540) % 360 - 180;
+  return xyz(dec * 180 / Math.PI, lon, 0).normalize();
+}
+
+// Earth: the day texture where the Sun shines, the city lights where it does not.
+const earthMat = new THREE.ShaderMaterial({
+  uniforms: { dayT: { value: null }, nightT: { value: null }, sun: { value: new THREE.Vector3(1, 0, 0) } },
+  vertexShader: `varying vec2 vUv; varying vec3 vN;
+    void main(){ vUv = uv; vN = normalize(mat3(modelMatrix) * normal);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragmentShader: `uniform sampler2D dayT, nightT; uniform vec3 sun; varying vec2 vUv; varying vec3 vN;
+    void main(){ float l = dot(normalize(vN), sun); float k = smoothstep(-0.12, 0.18, l);
+      vec3 day = texture2D(dayT, vUv).rgb * (0.30 + 0.85 * max(l, 0.0));
+      vec3 night = texture2D(nightT, vUv).rgb * 1.3 + vec3(0.01, 0.025, 0.06);
+      gl_FragColor = vec4(mix(night, day, k), 1.0); }`,
+});
+tex.load(IMG + "earth-blue-marble.jpg", t => { earthMat.uniforms.dayT.value = t; });
+tex.load(IMG + "earth-night.jpg", t => { earthMat.uniforms.nightT.value = t; });
+const earth = new THREE.Mesh(new THREE.SphereGeometry(R, 96, 64), earthMat);
+scene.add(earth);
+// the atmosphere: a soft blue rim
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.035, 64, 48), new THREE.ShaderMaterial({
+  side: THREE.BackSide, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+  vertexShader: `varying vec3 vN; void main(){ vN = normalize(normalMatrix * normal);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragmentShader: `varying vec3 vN; void main(){ float i = pow(0.72 - dot(vN, vec3(0,0,1.0)), 3.0);
+    gl_FragColor = vec4(0.30, 0.72, 1.0, 1.0) * i; }`,
+})));
+
+// ── data ────────────────────────────────────────────────────────────────────
+let SATS = [], CATS = {}, ME = null, FEATURED = [];
+const groups = {};            // cat → { points, idx: [sat index…], pos: Float32Array }
+const geo = { lat: null, lon: null, alt: null };   // latest positions, all satellites
+let selected = -1, follow = false, orbitLine = null, marker = null;
+
+const worker = new Worker(URL.createObjectURL(new Blob([`
+  importScripts("https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js");
+  let recs = [], obs = null;
+  onmessage = e => {
+    if (e.data.tle) {
+      recs = e.data.tle.map(([a, b]) => { try { return satellite.twoline2satrec(a, b); } catch (_) { return null; } });
+      obs = e.data.me; return;
+    }
+    const now = new Date(e.data.t), gmst = satellite.gstime(now), n = recs.length;
+    const lat = new Float32Array(n), lon = new Float32Array(n), alt = new Float32Array(n), el = new Int8Array(n);
+    const o = obs ? { latitude: obs.lat * Math.PI / 180, longitude: obs.lon * Math.PI / 180, height: 0 } : null;
+    for (let i = 0; i < n; i++) {
+      const r = recs[i]; let p = null;
+      if (r) { try { p = satellite.propagate(r, now).position; } catch (_) {} }
+      if (!p || isNaN(p.x)) { lat[i] = NaN; continue; }
+      const g = satellite.eciToGeodetic(p, gmst);
+      lat[i] = g.latitude * 57.29578; lon[i] = g.longitude * 57.29578; alt[i] = g.height;
+      if (o && e.data.above) {
+        const la = satellite.ecfToLookAngles(o, satellite.eciToEcf(p, gmst));
+        el[i] = la.elevation > 0 ? 1 : 0;
+      }
+    }
+    postMessage({ lat, lon, alt, el: e.data.above ? el : null }, [lat.buffer, lon.buffer, alt.buffer, el.buffer]);
+  };
+`], { type: "text/javascript" })));
+
+let above = null, tick = 0;
+worker.onmessage = e => {
+  Object.assign(geo, { lat: e.data.lat, lon: e.data.lon, alt: e.data.alt });
+  if (e.data.el) above = e.data.el;
+  placeAll();
+  if (e.data.el) counts();
+  $("load").style.display = "none";
+};
+function step() { worker.postMessage({ t: Date.now(), above: tick++ % 5 === 0 }); }
+
+const v3 = new THREE.Vector3();
+function placeAll() {
+  for (const g of Object.values(groups)) {
+    const a = g.pos;
+    g.idx.forEach((i, k) => {
+      const la = geo.lat[i];
+      if (isNaN(la)) { a[k * 3] = a[k * 3 + 1] = a[k * 3 + 2] = 0; return; }
+      xyz(la, geo.lon[i], geo.alt[i], v3);
+      a[k * 3] = v3.x; a[k * 3 + 1] = v3.y; a[k * 3 + 2] = v3.z;
+    });
+    g.points.geometry.attributes.position.needsUpdate = true;
+    g.points.geometry.computeBoundingSphere();
+  }
+  if (selected >= 0) placeSelected();
+}
+
+function buildGroups() {
+  const order = Object.keys(CATS);
+  for (const cat of order) {
+    const idx = [];
+    SATS.forEach((s, i) => { if (s.cat === cat) idx.push(i); });
+    const pos = new Float32Array(idx.length * 3);
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    const big = cat === "stations" ? 5 : cat === "starlink" ? 1.8 : 2.6;
+    const pts = new THREE.Points(geom, new THREE.PointsMaterial({
+      color: new THREE.Color(CATS[cat].color), size: big, sizeAttenuation: false,
+      transparent: true, opacity: cat === "starlink" ? 0.75 : 0.95, depthWrite: false }));
+    pts.userData.cat = cat;
+    scene.add(pts);
+    groups[cat] = { points: pts, idx, pos };
+  }
+}
+
+// ── panel: categories, featured, search ─────────────────────────────────────
+function counts() {
+  const tot = {}, up = {};
+  SATS.forEach((s, i) => {
+    tot[s.cat] = (tot[s.cat] || 0) + 1;
+    if (above && above[i]) up[s.cat] = (up[s.cat] || 0) + 1;
+  });
+  const allUp = above ? above.reduce((a, b) => a + b, 0) : 0;
+  $("stats").innerHTML = `🛰 <b>${fmt(SATS.length)}</b> satélites ativos` +
+    (above ? ` · <span class="up">${fmt(allUp)} acima de ${esc(ME.city)}</span>` : "");
+  $("cats").innerHTML = Object.entries(CATS).filter(([k]) => tot[k]).map(([k, c]) => `
+    <div class="cat${groups[k].points.visible ? "" : " off"}" data-cat="${k}">
+      <span class="dot" style="background:${c.color}"></span><span class="l">${esc(c.label)}</span>
+      <span class="c">${fmt(tot[k])}</span><span class="u">${above ? "↑ " + fmt(up[k] || 0) : ""}</span>
+      <span class="ls" data-list="${k}" title="Listar todos desta categoria">☰</span>
+    </div>`).join("");
+}
+$("cats").addEventListener("click", e => {
+  if (e.target.dataset.list) return listCat(e.target.dataset.list);
+  const el = e.target.closest(".cat"); if (!el) return;
+  const g = groups[el.dataset.cat]; g.points.visible = !g.points.visible;
+  el.classList.toggle("off", !g.points.visible);
+});
+
+const DO = {
+  live: ["▶ Vídeo ao vivo", async (b) => { b.innerHTML = '<span class="spin"></span>abrindo…';
+    const r = await api("live"); b.textContent = r.ok ? "▶ no ar no HUD" : (r.error || "não abriu"); }],
+  crew: ["👩‍🚀 Tripulação", showCrew],
+  hubble: ["🔭 Imagens recentes", showHubble],
+  earth: ["🌎 A Terra agora", (b, f) => showEarth(f.key)],
+  passes: ["🕑 Passagens", (b, f) => select(indexOf(f.norad), true)],
+};
+function renderFeatured() {
+  $("feat").innerHTML = FEATURED.map((f, k) => `
+    <div class="feat" data-k="${k}"><div class="t">${esc(f.label)}</div>
+      <div class="s">${esc(f.name)} · NORAD ${f.norad}</div>
+      <div class="btns">${f.do.map(d => `<button class="btn box" data-do="${d}">${DO[d][0]}</button>`).join("")}</div>
+    </div>`).join("");
+}
+$("feat").addEventListener("click", e => {
+  const card = e.target.closest(".feat"); if (!card) return;
+  const f = FEATURED[+card.dataset.k];
+  const b = e.target.closest("[data-do]");
+  if (b) { DO[b.dataset.do][1](b, f); if (b.dataset.do !== "passes") return; }
+  const i = indexOf(f.norad); if (i >= 0) select(i, true);
+});
+const indexOf = norad => SATS.findIndex(s => s.norad === norad);
+
+// every satellite of a category, by name, 500 at a time
+function row(i) {
+  return `<div class="res" data-i="${i}"><span class="dot" style="background:${CATS[SATS[i].cat].color}"></span>
+    <span class="n">${esc(SATS[i].name)}</span><span class="id">${SATS[i].norad}</span></div>`;
+}
+function listCat(cat) {
+  const all = groups[cat].idx.slice().sort((a, b) => SATS[a].name.localeCompare(SATS[b].name, "pt", { numeric: true }));
+  let shown = 0;
+  const box = $("results");
+  box.innerHTML = `<div class="head"><span>${esc(CATS[cat].label)}</span><span>${fmt(all.length)}</span></div><div id="lst"></div>`;
+  const more = () => {
+    $("lst").insertAdjacentHTML("beforeend", all.slice(shown, shown + 500).map(row).join(""));
+    shown += 500;
+    box.querySelector(".more")?.remove();
+    if (shown < all.length)
+      box.insertAdjacentHTML("beforeend", `<div class="more">mostrar mais (${fmt(all.length - shown)} restantes)</div>`);
+  };
+  more();
+  box.onclick = e => { if (e.target.classList.contains("more")) more(); };
+  $("q").value = "";
+  box.scrollTop = 0;
+}
+
+$("q").addEventListener("input", e => {
+  const t = fold(e.target.value.trim());
+  if (!t) { $("results").innerHTML = ""; return; }
+  const hits = [];
+  for (let i = 0; i < SATS.length && hits.length < 40; i++) {
+    const s = SATS[i];
+    if (s.f.includes(t) || String(s.norad) === t) hits.push(i);
+  }
+  $("results").innerHTML = hits.length ? hits.map(i => `
+    <div class="res" data-i="${i}"><span class="dot" style="background:${CATS[SATS[i].cat].color}"></span>
+      <span class="n">${esc(SATS[i].name)}</span><span class="id">${SATS[i].norad}</span></div>`).join("")
+    : '<div style="color:var(--dim);padding:4px">Nenhum satélite com esse nome.</div>';
+});
+$("results").addEventListener("click", e => {
+  const r = e.target.closest(".res"); if (r) select(+r.dataset.i, true);
+});
+
+// ── the selected satellite: marker, orbit, card, passes ─────────────────────
+function placeSelected() {
+  const i = selected, la = geo.lat[i];
+  if (isNaN(la)) return;
+  xyz(la, geo.lon[i], geo.alt[i], marker.position);
+  if (follow) {
+    const d = camera.position.length();
+    camera.position.lerp(v3.copy(marker.position).normalize().multiplyScalar(d), 0.15);
+  }
+  const s = SATS[i], rec = s.rec;
+  const pv = satellite.propagate(rec, new Date());
+  const v = pv.velocity ? Math.hypot(pv.velocity.x, pv.velocity.y, pv.velocity.z) : 0;
+  const period = 2 * Math.PI / rec.no;          // minutes
+  const year = s.l1.slice(9, 11), yr = +year < 57 ? 2000 + +year : 1900 + +year;
+  $("seltab").innerHTML = [
+    ["Posição", `${la.toFixed(2)}°, ${geo.lon[i].toFixed(2)}°`],
+    ["Altitude", `${fmt(Math.round(geo.alt[i]))} km`],
+    ["Velocidade", `${v.toFixed(2)} km/s · ${fmt(Math.round(v * 3600))} km/h`],
+    ["Uma volta", period < 1500 ? `${period.toFixed(1)} min` : `${(period / 60).toFixed(1)} h`],
+    ["Inclinação", `${(rec.inclo * 180 / Math.PI).toFixed(1)}°`],
+    ["Perigeu · apogeu", `${fmt(Math.round(rec.altp * 6378.137))} · ${fmt(Math.round(rec.alta * 6378.137))} km`],
+    ["Lançado", `${yr} (${s.l1.slice(9, 17).trim()})`],
+    ["NORAD", s.norad],
+  ].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join("");
+}
+
+function drawOrbit(i) {
+  if (orbitLine) { scene.remove(orbitLine); orbitLine.geometry.dispose(); orbitLine = null; }
+  const rec = SATS[i].rec, period = 2 * Math.PI / rec.no, now = Date.now(), pts = [];
+  const n = 240;
+  for (let k = 0; k <= n; k++) {
+    const t = new Date(now + (k / n) * period * 60000);
+    const p = satellite.propagate(rec, t).position;
+    if (!p) continue;
+    const g = satellite.eciToGeodetic(p, satellite.gstime(t));
+    pts.push(xyz(g.latitude * 57.29578, g.longitude * 57.29578, g.height));
+  }
+  orbitLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),
+    new THREE.LineBasicMaterial({ color: new THREE.Color(CATS[SATS[i].cat].color), transparent: true, opacity: 0.8 }));
+  scene.add(orbitLine);
+}
+
+function computePasses(i) {
+  // next 48 h over the user's place, highest point ≥ 10°
+  const rec = SATS[i].rec, o = { latitude: ME.lat * Math.PI / 180, longitude: ME.lon * Math.PI / 180, height: 0 };
+  const out = []; let cur = null; const t0 = Date.now();
+  for (let s = 0; s < 48 * 3600 && out.length < 5; s += 30) {
+    const t = new Date(t0 + s * 1000), p = satellite.propagate(rec, t).position;
+    if (!p) break;
+    const el = satellite.ecfToLookAngles(o, satellite.eciToEcf(p, satellite.gstime(t))).elevation * 57.29578;
+    if (el > 0) { if (!cur) cur = { rise: t, max: el, at: t }; else if (el > cur.max) { cur.max = el; cur.at = t; } }
+    else if (cur) { cur.set = t; if (cur.max >= 10) out.push(cur); cur = null; }
+  }
+  return out;
+}
+function showPasses(i) {
+  const rec = SATS[i].rec, period = 2 * Math.PI / rec.no;
+  if (period > 600) {                    // high orbits: always / never in sight, no "passes"
+    $("passes").innerHTML = `<div style="color:var(--dim)">Órbita alta: não faz "passagens" sobre ${esc(ME.city)}.</div>`;
+    return;
+  }
+  const ps = computePasses(i);
+  const day = d => { const t = new Date(); t.setHours(0, 0, 0, 0);
+    const n = Math.floor((new Date(d).setHours(0, 0, 0, 0) - t) / 864e5);
+    return n === 0 ? "hoje" : n === 1 ? "amanhã" : d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }); };
+  const hm = d => d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  $("passes").innerHTML = `<div style="color:var(--pri)">Passagens sobre ${esc(ME.city)} (48 h)</div>` +
+    (ps.length ? ps.map(p => `<div>${day(p.rise)} ${hm(p.rise)}–${hm(p.set)} · <span class="${p.max > 40 ? "hi" : ""}">
+      máx. ${p.max.toFixed(0)}° às ${hm(p.at)}</span></div>`).join("")
+      : `<div style="color:var(--dim)">Nenhuma passagem acima de 10° nas próximas 48 h.</div>`);
+}
+
+function flyTo(target) {
+  const from = camera.position.clone(), d = Math.max(camera.position.length(), target.length() * 1.6 + 60);
+  const to = target.clone().normalize().multiplyScalar(Math.min(d, 2400));
+  const t0 = performance.now();
+  (function anim() {
+    const k = Math.min(1, (performance.now() - t0) / 900), e = k < .5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
+    camera.position.lerpVectors(from, to, e);
+    if (k < 1) requestAnimationFrame(anim);
+  })();
+}
+
+function select(i, fly) {
+  if (i < 0) return;
+  selected = i; follow = false;
+  const s = SATS[i];
+  $("sel").style.display = "block";
+  $("selname").textContent = s.name;
+  $("selcat").innerHTML = `<span class="dot" style="background:${CATS[s.cat].color}"></span> ${esc(CATS[s.cat].label)}`;
+  const f = FEATURED.find(x => x.norad === s.norad);
+  $("selbtns").innerHTML = `<button class="btn box" id="bfollow">🎯 Seguir</button>` +
+    (f ? f.do.filter(d => d !== "passes").map(d => `<button class="btn box" data-do="${d}">${DO[d][0]}</button>`).join("") : "");
+  $("bfollow").onclick = () => { follow = !follow; $("bfollow").classList.toggle("on", follow); };
+  $("selbtns").querySelectorAll("[data-do]").forEach(b => b.onclick = () => DO[b.dataset.do][1](b, f));
+  $("label").textContent = s.name; $("label").style.display = "block";
+  marker.material.color.set(CATS[s.cat].color);
+  marker.visible = true;
+  placeSelected(); drawOrbit(i); showPasses(i);
+  if (fly) flyTo(marker.position);
+}
+function deselect() {
+  selected = -1; follow = false; marker.visible = false;
+  $("label").style.display = "none"; $("sel").style.display = "none";
+  if (orbitLine) { scene.remove(orbitLine); orbitLine = null; }
+}
+
+// ── picking ─────────────────────────────────────────────────────────────────
+const ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
+function pick(ev) {
+  const r = renderer.domElement.getBoundingClientRect();
+  mouse.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+  ray.params.Points.threshold = camera.position.length() / 260;
+  ray.setFromCamera(mouse, camera);
+  const objs = Object.values(groups).map(g => g.points).filter(p => p.visible);
+  const hits = ray.intersectObjects([earth, ...objs], false);
+  for (const h of hits) {
+    if (h.object === earth) return -1;           // behind the Earth: not this one
+    return groups[h.object.userData.cat].idx[h.index];
+  }
+  return -1;
+}
+let moved = 0;
+renderer.domElement.addEventListener("pointerdown", () => moved = 0);
+renderer.domElement.addEventListener("pointermove", ev => {
+  moved++;
+  if (moved % 3) return;
+  const i = pick(ev);
+  const tip = $("tip");
+  if (i < 0) { tip.style.display = "none"; renderer.domElement.style.cursor = ""; return; }
+  tip.innerHTML = `<span class="dot" style="background:${CATS[SATS[i].cat].color}"></span> ${esc(SATS[i].name)}`;
+  tip.style.left = ev.offsetX + 14 + "px"; tip.style.top = ev.offsetY + 10 + "px"; tip.style.display = "block";
+  renderer.domElement.style.cursor = "pointer";
+});
+renderer.domElement.addEventListener("click", ev => {
+  if (moved > 4) return;                          // a drag, not a click
+  const i = pick(ev);
+  if (i >= 0) select(i, false);
+});
+
+// ── modal: crew, Hubble, the Earth from GOES ────────────────────────────────
+function modal(title, html) { $("mtitle").textContent = title; $("mbody").innerHTML = html; $("modal").classList.add("on"); }
+function closeModal() { $("modal").classList.remove("on"); $("mbody").innerHTML = ""; }
+$("mclose").onclick = closeModal;
+$("modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
+
+async function showCrew() {
+  modal("Quem está no espaço agora", '<span class="spin"></span>consultando…');
+  const r = await api("crew");
+  if (!r.ok) return modal("Quem está no espaço agora", esc(r.error));
+  const total = Object.values(r.crew).reduce((a, b) => a + b.length, 0);
+  modal(`Quem está no espaço agora · ${total} pessoas`, '<div class="crew">' +
+    Object.entries(r.crew).map(([k, v]) => `<h3>${esc(k)} · ${v.length}</h3>` + v.map(p => `<div>${esc(p)}</div>`).join("")).join("") + "</div>");
+}
+async function showHubble() {
+  modal("Telescópio Hubble · imagens recentes", '<span class="spin"></span>consultando a NASA…');
+  const r = await api("hubble");
+  if (!r.ok || !r.images.length) return modal("Telescópio Hubble", "Nenhuma imagem agora.");
+  modal("Telescópio Hubble · imagens recentes", '<div class="grid">' + r.images.map((m, k) =>
+    `<div data-k="${k}"><img src="${esc(m.thumb)}" loading="lazy"><span>${esc(m.date)} · ${esc(m.title)}</span></div>`).join("") + "</div>");
+  $("mbody").onclick = e => {
+    const d = e.target.closest("[data-k]"); if (!d) return;
+    const m = r.images[+d.dataset.k];
+    bigImage(m.title, m.url);
+  };
+}
+async function showEarth(key) {
+  const r = await api("earth", { sat: key });
+  if (!r.ok) return;
+  const names = { south: "América do Sul (sul)", north: "América do Sul (norte)", full: "Terra inteira" };
+  const views = Object.entries(r.views);
+  const show = v => {
+    $("mbody").innerHTML = `<div class="btns" style="margin:0 0 8px">` + views.map(([k]) =>
+      `<button class="btn box${k === v ? " on" : ""}" data-v="${k}">${names[k]}</button>`).join("") +
+      `<button class="btn box" id="tohud">Mostrar no HUD</button></div>` +
+      `<div><span class="spin"></span>baixando a imagem de agora…</div><img class="big" style="display:none" src="${esc(r.views[v])}">`;
+    const im = $("mbody").querySelector("img");
+    im.onload = () => { im.style.display = "block"; im.previousElementSibling.remove(); };
+    $("mbody").querySelectorAll("[data-v]").forEach(b => b.onclick = () => show(b.dataset.v));
+    $("tohud").onclick = () => api("hud_photo", { url: r.views[v], title: `${names[v]} · ${key.toUpperCase()}` });
+  };
+  modal(`${key.toUpperCase()} · a Terra agora (atualiza a cada 10 min)`, "");
+  show(views[0][0]);
+}
+function bigImage(title, url) {
+  $("mtitle").textContent = title;
+  $("mbody").onclick = null;
+  $("mbody").innerHTML = `<div class="btns" style="margin:0 0 8px"><button class="btn box" id="tohud">Mostrar no HUD</button></div>
+    <img class="big" src="${esc(url)}">`;
+  $("tohud").onclick = () => api("hud_photo", { url, title });
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape" || document.activeElement === $("q")) return;
+  if ($("modal").classList.contains("on")) return closeModal();
+  deselect();
+});
+
+// ── render loop ─────────────────────────────────────────────────────────────
+const proj = new THREE.Vector3();
+function frame() {
+  controls.update();
+  earthMat.uniforms.sun.value.copy(sunDir(new Date()));
+  if (selected >= 0 && marker.visible) {
+    proj.copy(marker.position).project(camera);
+    const behind = proj.z > 1 || camera.position.dot(marker.position) < 0 &&
+      marker.position.length() < R * 1.6;
+    const lab = $("label");
+    lab.style.display = behind ? "none" : "block";
+    lab.style.left = (proj.x + 1) / 2 * view.clientWidth + "px";
+    lab.style.top = (1 - proj.y) / 2 * view.clientHeight + "px";
+  }
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+setInterval(() => {
+  const d = new Date();
+  $("clock").textContent = d.toLocaleTimeString("pt-BR") + " · UTC " + d.toISOString().slice(11, 19);
+}, 1000);
+
+// ── start ───────────────────────────────────────────────────────────────────
+(async () => {
+  // the selected one: a dot of fixed size on screen (a sphere in space filled the
+  // view when the camera came close to a satellite 36 000 km up)
+  const mg = new THREE.BufferGeometry();
+  mg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(3), 3));
+  marker = new THREE.Points(mg, new THREE.PointsMaterial({ color: 0xffffff, size: 11, sizeAttenuation: false,
+    transparent: true, opacity: 0.95, depthWrite: false }));
+  marker.frustumCulled = false;
+  marker.visible = false; scene.add(marker);
+  frame();
+  const r = await api("sats");
+  if (!r.ok) { $("load").textContent = "Não consegui carregar os satélites: " + (r.error || ""); return; }
+  CATS = r.cats; ME = r.me; FEATURED = r.featured;
+  SATS = r.sats.map(([name, norad, cat, l1, l2]) => ({ name, norad, cat, l1, l2, f: fold(name),
+    rec: satellite.twoline2satrec(l1, l2) }));
+  // the user's place: a small green ring
+  const home = new THREE.Mesh(new THREE.RingGeometry(1.2, 2.0, 24),
+    new THREE.MeshBasicMaterial({ color: 0x3dffb0, side: THREE.DoubleSide }));
+  xyz(ME.lat, ME.lon, 15, home.position); home.lookAt(0, 0, 0); scene.add(home);
+  camera.position.copy(xyz(ME.lat, ME.lon, 0).normalize().multiplyScalar(380));
+  buildGroups(); renderFeatured(); counts();
+  worker.postMessage({ tle: r.sats.map(s => [s[3], s[4]]), me: ME });
+  step(); setInterval(step, 1000);
+  const focus = Q.get("focus");
+  if (focus) {
+    const t = fold(focus);
+    const wait = setInterval(() => {
+      if (!geo.lat) return;
+      clearInterval(wait);
+      const i = SATS.findIndex(s => s.f === t) >= 0 ? SATS.findIndex(s => s.f === t) : SATS.findIndex(s => s.f.includes(t));
+      if (i >= 0) select(i, true);
+    }, 200);
+  }
+})();
+</script>
+</body>
+</html>
